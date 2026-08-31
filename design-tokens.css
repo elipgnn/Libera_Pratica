@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Libera Pratica — Design tokens
+   Estratti da libera-pratica-app.html. Fonte di verità unica per colori,
+   font, scala tipografica e griglia/spaziature usati nell'app.
+   ========================================================================== */
+
+:root{
+  /* ---- Colori ---- */
+  --ink:      #14130F; /* testo/sfondo scuro principale */
+  --paper:    #F2EEE6; /* sfondo chiaro principale */
+  --blu:      #1B4695; /* area: Questo Mare */
+  --rosso:    #D82E1D; /* area: Via Maestra */
+  --verde:    #046B33; /* area: Adesso Parco */
+  --giallo:   #F3AB01; /* area: Mare Culturale */
+  --bordeaux: #8D0039; /* accento app — non mappato a una macro-area */
+  --white:    #FFFFFF;
+  --black:    #000000;
+  --line:     rgba(20,19,15,.14);   /* separatore su sfondo chiaro */
+  --linep:    rgba(242,238,230,.22); /* separatore su sfondo scuro (bassa opacità) */
+  --grey-map: #C7C7C0; /* placeholder box mappa */
+
+  /* ---- Font ---- */
+  /* Stack Sans Text è il font previsto (Regular, in tutta l'app) ma non è un
+     font web pubblico: nessun @font-face incluso, quindi ricade sempre su
+     Hanken Grotesk. Stessa cosa per Stack Sans Notch (parole Sabir/soglia). */
+  --font-display: 'Stack Sans Text', 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-notch:   'Stack Sans Notch', 'Hanken Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono:    'Space Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+
+  /* ---- Peso e interlinea standard ---- */
+  --fw-regular: 400; /* unico peso testo usato in tutta l'app */
+  --lh-base:    1.1; /* = 110%, interlinea standard su tutti i testi */
+
+  /* ---- Scala tipografica (px, tutti regular/110% salvo dove indicato) ---- */
+  --fs-mega:      30px; /* mega-titolo: hero "Sabir, cittadino del mondo" */
+  --fs-title:     28px; /* titoli di sezione: h-title, "Il tuo sigillo", "Percorsi vicino a te", card mappa 1234 */
+  --fs-route:     22px; /* titolo percorso: barre sticky Home + lista Percorsi */
+  --fs-body:      16px; /* paragrafo standard: intro, descrizioni, sottotitoli percorso */
+  --fs-secondary: 12px; /* testo secondario: kicker, legal, meta, didascalie, riga min/tappe */
+  --fs-button:    18px; /* testo bottoni .appbtn */
+
+  /* ---- Griglia / spaziature ---- */
+  --grid-margin: 24px; /* margine laterale standard (sinistra sempre, destra dove previsto) */
+  --grid-gutter: 14px; /* gutter tra colonne/elementi orizzontali */
+  --grid-cols:   4;    /* colonne della griglia di riferimento */
+  --rhythm:      8px;  /* unità del ritmo verticale (righe multiple di 8px) */
+}
+
+/* ==========================================================================
+   Riferimento rapido — dove si usa ogni dimensione (solo commento, non CSS)
+   ==========================================================================
+   30px  mega titolo    → .h-hero (testo Sabir in Home)
+   28px  titolo sezione → .h-title, "Il tuo sigillo", "Percorsi vicino a te",
+                           "Attracchi registrati", cert .ct-title, footer .pf-link,
+                           menu .navlinks li button, numeri grandi card Mappa
+   22px  titolo percorso→ .percbar .pb-t (Home), .routerow .rr-t (Percorsi)
+   16px  paragrafo      → intro di schermata, .ac-d, .pi-s, .rr-s, cert .ct-body
+   12px  secondario     → .kicker, .pf-legal, .pi-meta, .rr-meta, note/legal, det-meta
+
+   Margini/spaziature ricorrenti:
+   24px  margine laterale standard (padding di .pad, .block, card, righe liste)
+   16px  gutter tra elementi/colonne
+    8px  unità di ritmo verticale (i margin-top "puliti" sono sempre multipli di 8)
+   48px  distanza titolo→paragrafo nei blocchi principali (Il tuo sigillo, Percorsi, Mappa)
+
+   Font-weight: sempre 400 (regular) sul testo; i bottoni .appbtn usano 600
+   come unica eccezione residua. .notch (parole Sabir) è l'unico stile con
+   italic+600, tranne dove esplicitamente reso regular (h-hero, contumacia,
+   sottotitoli percorso, descrizioni card Mappa — vedi regole scoped ".notch"
+   nel file principale).
+   ========================================================================== */

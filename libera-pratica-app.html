@@ -1,0 +1,956 @@
+<!-- Libera Pratica — Webapp — Ancona 2028 -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Libera Pratica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward&icon_names=add&icon_names=check" />
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+:root{
+  --ink:#000000; --paper:#FFFFFF;
+  --blu:#005FA0;      /* Questo Mare */
+  --rosso:#D82E1D;    /* Via Maestra */
+  --verde:#3E8638;    /* Adesso Parco */
+  --giallo:#F8B217;   /* Mare Culturale */
+  --bordeaux:#3A2F7F; /* accento app (viola) — non mappato a un'area */
+  --line:rgba(20,19,15,.14);
+  --linep:rgba(242,238,230,.22);
+  /* Stack Sans Text è il font previsto (Regular in tutta l'app); non è un font web pubblico e qui non è
+     incorporato via @font-face, quindi finché non viene fornito il file finisce sempre sul fallback
+     Hanken Grotesk. .notch (italic+600) resta lo stand-in del taglio Notch per le parole di soglia/Sabir. */
+  --disp:'Stack Sans Text','Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+  --mono:'Space Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;overflow-x:hidden;overscroll-behavior-x:none}
+body{margin:0;background:#1d1d1b;color:var(--ink);font-family:var(--disp);font-weight:400;
+  -webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;min-height:100dvh}
+h1,h2,h3,h4,p,ol{margin:0;padding:0}
+button{font-family:var(--disp)}
+.notch{font-family:'Stack Sans Notch','Hanken Grotesk','Helvetica Neue',Arial,sans-serif;font-style:normal;font-weight:400}
+.mono{font-family:var(--mono)}
+.material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;
+  font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;
+  white-space:nowrap;word-wrap:normal;direction:ltr;vertical-align:middle;
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+
+/* l'app resta sempre a dimensioni telefono: larghezza E altezza massime fisse, centrata, mai a piena finestra desktop.
+   min() lascia il comportamento a schermo intero sui telefoni veri (dvh reale sempre minore del tetto) e applica
+   il tetto solo quando lo schermo è più alto delle dimensioni di un telefono (desktop). */
+.viewport{width:100%;max-width:430px;height:min(100%,932px);height:min(100dvh,932px);overflow-y:auto;overflow-x:hidden;overscroll-behavior-x:none;-webkit-overflow-scrolling:touch;background:var(--paper);position:relative}
+.viewport::-webkit-scrollbar{width:0}
+
+/* header — barra unica fedele a Figma: margine 20px solo a sinistra, filo a destra, altezza 72px (9 righe) */
+.apphead{position:sticky;top:0;z-index:30;color:var(--paper)}
+.ah-bar{position:relative;height:72px;margin-left:20px;background:#000;display:flex;align-items:center;justify-content:flex-start;padding:0}
+.ah-logo{height:36px;width:auto;margin-left:8px;filter:brightness(0) invert(1);cursor:pointer}
+
+/* burger animato — logica/timing fedeli al riferimento Sonder, unità in px fisse (niente --scrollbar-width/vw).
+   Le linee sono allineate al margine destro (20px dal bordo), non più centrate nell'hotspot. */
+.burger{background-color:transparent;position:absolute;top:0;right:0;height:100%;width:64px;border:none;
+  display:flex;flex-direction:column;justify-content:center;align-items:flex-end;cursor:pointer;transition:opacity .3s}
+.burger:hover{opacity:.5}
+.burger::before{content:"";height:2px;width:30px;background-color:#fff;position:absolute;top:50%;right:20px;
+  transform:translateY(-50%);transition:opacity .5s cubic-bezier(.87,0,.13,1)}
+.burger>span{width:30px;height:2px;position:absolute;top:50%;right:20px;transform:translateY(-50%)}
+.burger>span::before,.burger>span::after{content:"";height:2px;width:100%;background-color:#fff;
+  position:absolute;top:50%;left:0;transition:transform .5s cubic-bezier(.87,0,.13,1)}
+.burger>span::before{transform:translateY(calc(-50% - 8px))}
+.burger>span::after{transform:translateY(calc(-50% + 8px))}
+.apphead.open .burger::before{opacity:0}
+.apphead.open .burger>span::before{transform:translateY(-50%) rotate(-45deg)}
+.apphead.open .burger>span::after{transform:translateY(-50%) rotate(45deg)}
+
+/* pannello di navigazione a tendina — struttura/timing fedeli al riferimento Sonder, in px fissi anziché vw.
+   left:20px allineato al margine dell'header: lascia visibile la striscia di margine anche a menu aperto. */
+.navigation{position:absolute;overflow:hidden;top:100%;left:20px;right:0;height:0;background:#000;
+  transition:height .5s cubic-bezier(.87,0,.13,1)}
+.navigation .content{height:calc(100vh - 72px);display:flex;flex-direction:column;justify-content:space-between;
+  opacity:0;transition:opacity .5s cubic-bezier(.87,0,.13,1)}
+.apphead.open .navigation{height:calc(100vh - 72px);overflow:auto}
+.apphead.open .navigation .content{opacity:1}
+
+.navlinks{display:flex;flex-direction:column;list-style:none;padding:0;margin:0;border-top:1px solid #fff}
+.navlinks li{display:flex;flex-direction:column}
+.navlinks li button{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #fff;
+  color:inherit;font-family:var(--disp);font-weight:400;font-size:28px;letter-spacing:-.02em;
+  padding:16px 20px;cursor:pointer}
+
+.appscreen{display:none}
+.appscreen.on{display:block}
+.pad{padding:20px 20px 32px}
+.kicker{font-size:12px;font-weight:400;line-height:1.1;opacity:.65}
+.h-title{font-weight:400;letter-spacing:-.025em;line-height:1.1;font-size:28px}
+#det-title{font-size:22px}
+.h-hero{font-weight:400;font-size:30px;letter-spacing:-.02em;line-height:1.1}
+.h-big{font-weight:700;font-size:44px;letter-spacing:-.03em;line-height:.95}
+
+.appbtn{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--ink);
+  color:var(--paper);border:none;cursor:pointer;font-weight:600;font-size:18px;padding:16px 20px;letter-spacing:-.01em}
+.appbtn.verde{background:var(--verde);color:#fff}
+.appbtn.bordeaux{background:var(--bordeaux);color:#fff}
+
+/* barra "Per iniziare ascolta" espandibile — struttura/timing fedeli al riferimento Sonder (bottone video),
+   dimensioni adattate al nostro bottone a due righe invece che alla singola riga del riferimento */
+.introbar{background:var(--ink)}
+.introhead{position:relative}
+.introbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;background:none;
+  border:none;color:var(--paper);cursor:pointer;padding:20px 20px;font-family:var(--disp);text-align:left}
+.introlabel{flex:1 1 auto;min-width:0}
+.introicon{width:44px;height:44px;border-radius:50%;border:2px solid var(--paper);display:flex;align-items:center;
+  justify-content:center;position:relative;flex:0 0 auto;transition:border-color .3s}
+.introicon::after{content:"";display:block;width:0;height:0;border-top:8px solid transparent;
+  border-bottom:8px solid transparent;border-left:13px solid var(--paper);margin-left:4px}
+.introbar.open .introicon::before,.introbar.open .introicon::after{content:"";display:block;position:absolute;
+  top:50%;left:50%;width:16px;height:2px;background:var(--paper);border:none;margin:0}
+.introbar.open .introicon::before{transform:translate(-50%,-50%) rotate(45deg)}
+.introbar.open .introicon::after{transform:translate(-50%,-50%) rotate(-45deg)}
+.introwrap{position:relative;width:100%;height:0;overflow:hidden;background:var(--ink);
+  transition:height .5s cubic-bezier(.87,0,.13,1)}
+.introbar.open .introwrap{height:224px}
+.introcontent{position:relative;height:224px;opacity:0;transition:opacity .5s cubic-bezier(.87,0,.13,1)}
+.introbar.open .introcontent{opacity:1}
+.introvideo{position:absolute;left:0;top:0;width:100%;height:100%;border:0}
+.appbtn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+
+.block{padding:20px 20px}
+.block.bordeaux{background:var(--bordeaux);color:#fff}
+.block.ink{background:var(--ink);color:var(--paper)}
+
+.imgph{position:relative;background:var(--ink);overflow:hidden;flex:0 0 auto}
+.imgph svg{display:block;width:100%;height:100%}
+.duo{display:flex}
+.duo .imgph{flex:1 1 auto;min-width:0}
+.duo .swatch{width:calc(25vw + 14px);flex:0 0 auto}
+
+.areachip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
+  text-transform:uppercase;letter-spacing:.06em;border:2px solid currentColor;padding:8px 13px;margin:0 8px 8px 0}
+
+.routerow{display:block;width:100%;text-align:left;background:var(--ink);color:var(--paper);border:none;
+  border-bottom:1px solid #fff;cursor:pointer;padding:16px 20px;font-family:var(--disp)}
+.routerow .rr-t{font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;margin:0}
+.routerow .rr-s{margin:0;font-size:16px;font-weight:400;opacity:.85;margin-top:24px;line-height:1.1;max-width:320px}
+.routerow .rr-row{display:flex;align-items:center;justify-content:space-between;margin-top:40px}
+.routerow .rr-meta{position:relative;width:100%;font-size:16px;font-weight:400;line-height:1.1}
+.routerow .rr-meta span{display:inline-flex;align-items:center;gap:8px}
+.routerow .rr-meta span:nth-child(2){position:absolute;top:0;left:calc(33.333% + 4.667px)}
+.routerow svg,.routerow .material-symbols-outlined{flex:0 0 auto;font-size:32px}
+
+/* "Percorsi vicino a te" — stack di barre sticky che si impilano scorrendo, stessa meccanica
+   del riferimento Sonder "How we work" (position:sticky + bottom calcolato su --item-position) */
+.percblock{position:relative}
+.percbar{height:56px;width:100%;background:var(--bordeaux);color:#fff;border:none;border-top:1px solid #fff;
+  padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;
+  position:sticky;bottom:calc((var(--total-items) - var(--item-position)) * 56px);
+  cursor:pointer;text-align:left;font-family:var(--disp)}
+.percbar .pb-t{font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;margin:0}
+.percitem{background:var(--bordeaux);color:#fff;position:relative;padding:8px 20px 16px 20px}
+.percitem .pi-s{margin:0;font-size:16px;font-weight:400;line-height:1.1;max-width:320px}
+.percitem .pi-row{display:flex;align-items:center;justify-content:space-between;margin-top:40px}
+.percitem .pi-meta{position:relative;width:100%;font-size:16px;font-weight:400;line-height:1.1}
+.percitem .pi-meta span{display:inline-flex;align-items:center;gap:8px}
+.percitem .pi-meta span:nth-child(2){position:absolute;top:0;left:calc(33.333% + 4.667px)}
+.percitem .material-symbols-outlined{font-size:32px}
+
+.attraccorow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;color:#fff;min-height:88px}
+.attraccorow .ar-t{font-weight:400;font-size:22px;line-height:1.1}
+.attraccorow .ar-m{font-size:12px;font-weight:400;line-height:1.1;opacity:.85;margin-top:4px}
+.attraccorow .ar-icon{width:40px;height:40px;flex:0 0 auto}
+.attraccorow .ar-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+
+.tappe-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;
+  border-bottom:1px solid #000;gap:16px}
+.tappe-item .tp-t{font-weight:400;font-size:16px;line-height:1.1}
+.tappe-item .tp-icon{width:28px;height:28px;flex:0 0 auto}
+.tappe-item .tp-icon .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+
+.ticket-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 20px}
+.ticket-row.a{background:var(--bordeaux);color:#fff}
+.ticket-row.b{background:var(--paper);color:var(--ink)}
+.ticket-row .tk-t{font-weight:400;font-size:22px;line-height:1.1}
+.ticket-row .tk-s{font-size:12px;font-weight:400;opacity:.85;margin-top:8px;line-height:1.1;max-width:calc(66.667% - 4.667px)}
+.ticket-row .tk-p{font-weight:400;font-size:22px;line-height:1;white-space:nowrap}
+
+.sponsorbar{overflow:hidden;padding:20px 0}
+.sponsortrack{display:flex;gap:20px;width:max-content;animation:sponsorscroll 32s linear infinite}
+.sponsorbar .splogo{flex:0 0 auto;width:116px;height:74px;display:flex;align-items:center;justify-content:center;
+  background:#fff;border-radius:4px;padding:8px}
+.sponsorbar .splogo img{max-width:100%;max-height:100%;object-fit:contain;display:block;filter:grayscale(1)}
+@keyframes sponsorscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.ticker{overflow:hidden;background:var(--ink);height:128px;padding-top:16px}
+.tickertrack{display:flex;gap:40px;width:max-content;animation:tickerscroll 15s linear infinite}
+.tickertrack span{font-weight:400;font-size:28px;line-height:1.1;letter-spacing:-.01em;color:var(--paper);white-space:nowrap}
+@keyframes tickerscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.mapbox{position:relative;background:#E7E3DA;flex:0 0 auto}
+.mapbox svg{display:block;width:100%}
+.pin{cursor:pointer}
+.pincard{display:none;align-items:center;justify-content:space-between}
+.map-pin{width:12px;height:12px}
+.map-pin .dot{width:100%;height:100%;border-radius:50%;transition:transform .2s ease}
+.map-pin.on .dot{transform:scale(1.35)}
+
+.areacards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
+.areacards::-webkit-scrollbar{height:0}
+.areacard{flex:0 0 256px;scroll-snap-align:start;padding:20px;color:#fff;min-height:380px;
+  display:flex;flex-direction:column;justify-content:space-between}
+.areacard .ac-t{font-weight:400;font-size:22px;line-height:1.1}
+.areacard .ac-d{font-size:16px;font-weight:400;line-height:1.1;margin-top:36px;max-width:230px}
+.areacard .ac-bottom{display:flex;align-items:flex-end;justify-content:space-between;margin-top:16px;gap:16px}
+.areacard .ac-icon{width:60px;height:60px;flex:0 0 auto}
+.areacard .ac-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+.areacard .ac-nums{font-family:var(--mono);font-size:24px;line-height:1.1;letter-spacing:.05em;white-space:nowrap}
+.areacard .ac-nums span{opacity:.4;cursor:pointer}
+.areacard .ac-nums span.on{opacity:1}
+.areacard .ac-nums span.on{opacity:1}
+
+.stamp-slot{position:relative;height:452px;margin:0 20px}
+.stamp-slot img{position:absolute;width:136px;height:136px;opacity:0;cursor:grab;touch-action:none;
+  transform:scale(.6) rotate(var(--rot,0deg));transition:opacity .35s ease,transform .35s ease}
+.stamp-slot img.show{opacity:1;transform:scale(1) rotate(var(--rot,0deg))}
+
+.areapick-overlay{position:absolute;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;
+  justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s .3s}
+.areapick-overlay.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s ease}
+.areapick-sheet{background:#fff;color:#000;width:100%;padding:20px;box-sizing:border-box;transform:translateY(100%);
+  transition:transform .4s cubic-bezier(.87,0,.13,1)}
+.areapick-overlay.show .areapick-sheet{transform:translateY(0)}
+.areapick-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;border-top:1px solid #000;
+  padding:16px 0;font-family:var(--disp);font-size:16px;font-weight:400;line-height:1.1;text-align:left;cursor:pointer;color:inherit}
+.areapick-btn:first-of-type{border-top:none;margin-top:16px}
+.areapick-btn .aic-wrap{width:28px;height:28px;flex:0 0 auto}
+.areapick-btn .aic-wrap .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+.stamp-slot img.dragging{cursor:grabbing;transition:none}
+
+.cert{padding:20px 20px 32px;text-align:center;color:#fff}
+.cert .ct-mark{width:120px;height:120px;margin:0 auto 16px}
+.cert .ct-k{font-size:12px;font-weight:400;line-height:1.1;opacity:.7}
+.cert .ct-title{font-size:28px;margin:16px 0 16px}
+.cert .ct-body{font-size:16px;font-weight:400;line-height:1.1;max-width:300px;margin:0 auto}
+.cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;opacity:.7}
+/* footer di navigazione — in fondo alla pagina, non fissa, come su un sito */
+.pagefooter{background:#fff;color:#000}
+#s-dettaglio.on ~ .pagefooter{border-top:1px solid #000}
+.pf-link{display:block;width:100%;text-align:left;background:none;border:none;color:inherit;cursor:pointer;
+  font-family:var(--disp);font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;padding:16px 20px;
+  border-bottom:1px solid #000}
+.pf-legal{display:flex;align-items:center;justify-content:space-between;padding:40px 20px 20px;
+  font-size:12px;font-weight:400;line-height:1.1;opacity:.75;gap:16px}
+
+/* --- griglia di riferimento temporanea: colonne 6/16/20, righe 8/16 — da rimuovere a verifica ultimata --- */
+.gridlayer{position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:430px;transform:translateX(-50%);z-index:9999;pointer-events:none}
+.gridlayer .cols{position:absolute;inset:0;display:flex;gap:14px;padding:0 20px}
+.gridlayer .cols i{flex:1 1 0;background:rgba(255,0,150,.09);border-left:1px solid rgba(255,0,150,.35);
+  border-right:1px solid rgba(255,0,150,.35);font-style:normal}
+.gridlayer .rows{position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to bottom,rgba(0,140,255,.4) 0,rgba(0,140,255,.4) 1px,transparent 1px,transparent 8px);
+  background-position:0 16px}
+body.grid-off .gridlayer{display:none}
+.gridtoggle{position:fixed;right:14px;bottom:14px;z-index:10000;background:var(--ink);color:var(--paper);
+  border:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:9px 13px;cursor:pointer;
+  text-transform:uppercase}
+</style>
+
+<div class="viewport" id="viewport">
+
+      <div class="apphead" id="appheader">
+        <div class="ah-bar">
+          <img src="asset/loghi/logo.svg" alt="Libera Pratica" class="ah-logo" onclick="go('home')">
+          <button class="burger" id="burgerBtn" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false"><span></span></button>
+        </div>
+        <nav class="navigation">
+          <div class="content">
+            <ul class="navlinks">
+              <li><button onclick="go('libera')">Libera pratica</button></li>
+              <li><button onclick="go('sigillo')">Sigillo</button></li>
+              <li><button onclick="go('percorsi')">Percorsi</button></li>
+              <li><button onclick="go('mappa')">Mappa</button></li>
+              <li><button onclick="go('biglietti')">Biglietti</button></li>
+              <li><button onclick="go('regolamento')">Regolamento</button></li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+
+      <!-- HOME -->
+      <div class="appscreen on" id="s-home">
+        <div class="pad" style="padding-bottom:20px">
+          <p class="h-hero"><span class="notch">Sabir</span>, cittadino del mondo. <span class="notch">Bono viaggio</span> — sei attraccato nel porto di Ancona.</p>
+        </div>
+        <div class="duo" style="height:152px;margin-top:96px">
+          <div class="imgph" style="flex:0 0 calc(66.667% - 4.667px)"><video src="asset/video/video_ancona_6_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="swatch imgph" style="width:auto;flex:1 1 auto;background:var(--bordeaux)"></div>
+        </div>
+        <div class="introbar" id="introBar">
+          <div class="introhead">
+            <button class="introbtn" onclick="toggleIntro()">
+              <span class="introlabel"><span style="display:block;font-size:22px;font-weight:400;line-height:1.1;text-align:left">Per iniziare ascolta</span><span style="display:block;font-size:22px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left">la storia del Lazzaretto</span></span>
+              <span class="introicon"></span>
+            </button>
+          </div>
+          <div class="introwrap">
+            <div class="introcontent">
+              <iframe class="introvideo" src="" data-src="https://www.youtube.com/embed/j0KrJ65Taoc?enablejsapi=1"
+                title="Per iniziare ascolta la storia del Lazzaretto" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="pad" style="position:relative;padding-top:20px">
+          <p style="font-size:28px;font-weight:400;line-height:1.1;color:var(--ink)">Il tuo sigillo</p>
+          <p style="font-size:16px;margin-top:56px;line-height:1.1">Ricorda, cittadino del mondo: per essere ammesso ad Ancona dovrai completare tutte le tappe della tua <span class="notch">contumacia</span>.</p>
+          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Continua l'ammissione <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+        </div>
+        <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
+          <p style="color:#fff;font-size:28px;font-weight:400;line-height:1.1">Percorsi vicino a te</p>
+          <p style="color:#fff;font-size:16px;line-height:1.1;margin-top:136px">Ricorda, cittadino del mondo: le rotte più vicine a te iniziano a un passo.</p>
+        </div>
+        <div class="percblock" style="--total-items:3">
+          <button class="percbar" style="--item-position:1" onclick="go('dettaglio','contumacia')">
+            <h3 class="pb-t">La contumacia gentile</h3>
+          </button>
+          <div class="percitem">
+            <p class="pi-s"><span class="notch">Spettar</span> e capire — l'attesa raccontata da chi la costruì.</p>
+            <div class="pi-row">
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~60 min</span><span>3 tappe</span></div>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+
+          <button class="percbar" style="--item-position:2" onclick="go('dettaglio','guasco')">
+            <h3 class="pb-t">Il fiato del Guasco</h3>
+          </button>
+          <div class="percitem">
+            <p class="pi-s"><span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.</p>
+            <div class="pi-row">
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~110 min</span><span>5 tappe</span></div>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+
+          <button class="percbar" style="--item-position:3" onclick="go('dettaglio','sale')">
+            <h3 class="pb-t">La rotta del sale</h3>
+          </button>
+          <div class="percitem">
+            <p class="pi-s"><span class="notch">Servir</span> il porto — raccontato da chi lo ha disegnato.</p>
+            <div class="pi-row">
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~80 min</span><span>4 tappe</span></div>
+              <span class="material-symbols-outlined">arrow_forward</span>
+            </div>
+          </div>
+        </div>
+        <div class="duo">
+          <div class="swatch imgph" style="width:auto;flex:1 1 0;aspect-ratio:1/1;background:#000"></div>
+          <div class="imgph" style="flex:1 1 0;aspect-ratio:1/1"><img src="asset/img/ancona_2.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+        </div>
+      </div>
+
+      <!-- REGOLAMENTO -->
+      <div class="appscreen" id="s-regolamento">
+        <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
+          <h2 class="h-title" style="color:#fff">Il Regolamento</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;opacity:.9;line-height:1.1">Per essere ammesso, basta attraversare la città — non correrla tutta. Quattro luoghi, quattro anime di Ancona. Il resto è libertà.</p>
+        </div>
+        <div id="regolamento-atti"></div>
+        <div class="ticker">
+          <div class="tickertrack">
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERCORSI (lista) -->
+      <div class="appscreen" id="s-percorsi">
+        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Percorsi</h2>
+          <p style="font-size:16px;font-weight:400;opacity:.85;margin-top:160px;line-height:1.1">Poche rotte, scelte con cura. Ognuna passa dal mare e dal parco.</p>
+        </div>
+        <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px">
+          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;opacity:.9;text-align:right">Percorsi possibili</span>
+          <span class="h-big" style="display:block;font-weight:400;line-height:.85;font-size:50px;margin-top:8px;text-align:right">12</span>
+          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:112px;font-size:12px;font-weight:400;line-height:1.1">
+            <span>2 rotte fatte</span><span>1 lasciata a metà</span><span>10 da completare</span>
+          </div>
+        </div>
+        <div id="percorsi-list"></div>
+        <div class="duo">
+          <div class="imgph" style="flex:1 1 0;aspect-ratio:1/1"><img src="asset/img/ancona_4.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="swatch imgph" style="width:auto;flex:1 1 0;aspect-ratio:1/1;background:var(--bordeaux)"></div>
+        </div>
+      </div>
+
+      <!-- DETTAGLIO PERCORSO (dinamico) -->
+      <div class="appscreen" id="s-dettaglio">
+        <div class="duo" style="height:177px">
+          <div class="imgph"><video src="asset/video/video_ancona_4_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="swatch imgph" id="det-swatch" style="display:flex;align-items:center;justify-content:center">
+            <span id="det-swatch-label" style="color:#fff;font-weight:400;font-size:40px;letter-spacing:.02em;white-space:nowrap;transform:rotate(-90deg)"></span>
+          </div>
+        </div>
+        <div class="pad" style="padding-bottom:8px;padding-top:20px">
+          <div id="det-chips"></div>
+          <h2 class="h-title" id="det-title" style="margin-top:16px"></h2>
+          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:56px;line-height:1.1" id="det-desc"></p>
+        </div>
+        <div class="mapbox" id="det-map" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
+        <div id="det-meta" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:#fff;font-size:16px;font-weight:400;line-height:1.1"></div>
+        <ol id="det-tappe" style="list-style:none;margin:8px 0;padding:0"></ol>
+        <div class="pad" style="padding-top:20px">
+          <button class="appbtn" id="det-cta" onclick="attraccaDaPercorso()">+ Attracca al primo molo</button>
+          <button class="appbtn ghost" style="margin-top:8px" onclick="go('biglietti')" id="det-ticket">Biglietto del percorso · 8 €</button>
+        </div>
+      </div>
+
+      <!-- MAPPA -->
+      <div class="appscreen" id="s-mappa">
+        <div class="duo" style="height:177px">
+          <div class="imgph"><img src="asset/img/ancona_1.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="swatch imgph" style="background:var(--bordeaux)"></div>
+        </div>
+        <div class="pad" style="padding-bottom:8px;padding-top:20px"><h2 class="h-title">Mappa</h2>
+          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:56px;line-height:1.1">I punti d'attracco per le quattro macro-aree di «Questo Adesso». Mira — guarda dove puoi scendere a terra.</p>
+        </div>
+        <div class="mapbox" id="osmMap" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
+        <div id="pincard" class="block ink pincard"><div style="max-width:calc(83.333% - 2.333px)"><div style="font-weight:400;font-size:16px;line-height:1.1" id="pin-name"></div><p style="font-size:12px;font-weight:400;line-height:1.1;opacity:.75;margin-top:4px" id="pin-note"></p></div></div>
+        <div class="areacards" id="mappa-cards"></div>
+      </div>
+
+      <!-- SIGILLO -->
+      <div class="appscreen" id="s-sigillo">
+        <div class="pad" style="padding-bottom:0"><h2 class="h-title">Il Sigillo</h2></div>
+        <div class="stamp-slot" id="stampSlot"></div>
+        <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px;margin-top:8px">
+          <p style="font-size:28px;font-weight:400;line-height:1.1;color:#fff">Attracchi registrati</p>
+          <p style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px">Se non appare automaticamente registra manualmente il tuo attracco inserendo poche e semplici informazioni</p>
+          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" id="stampBtn" onclick="registerAttracco()">+ Registra attracco</button>
+        </div>
+        <div id="attracchi"></div>
+        <div class="duo" style="height:177px">
+          <div class="swatch imgph" style="background:#000"></div>
+          <div class="imgph"><video src="asset/video/video_ancona_3_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+        </div>
+      </div>
+
+      <!-- BIGLIETTI -->
+      <div class="appscreen" id="s-biglietti">
+        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Biglietteria</h2>
+          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:160px;line-height:1.1">Un solo portale. Pacchetti cumulativi per percorso — eventi, luoghi, spostamenti. La Libera Pratica non è mai in vendita.</p>
+        </div>
+        <div class="duo" style="height:177px">
+          <div class="imgph"><img src="asset/img/ancona_6.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="swatch imgph" style="background:var(--bordeaux)"></div>
+        </div>
+        <div class="sponsorbar">
+          <div class="sponsortrack">
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-comune-ancona.jpg" alt="Comune di Ancona"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-regione-marche.jpg" alt="Regione Marche"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-adsp.jpg" alt="Autorità di Sistema Portuale"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-ministero-della-cultura.jpg" alt="Ministero della Cultura"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-Ente-Parco-Regionale-Conero.jpg" alt="Ente Parco Regionale del Conero"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-marche-teatro.jpg" alt="Marche Teatro"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-fondazione-marche-cultura.jpg" alt="Fondazione Marche Cultura"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-dorica-port-services.jpg" alt="Dorica Port Services"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-trasporti.jpg" alt="Trasporti"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-comune-ancona.jpg" alt="Comune di Ancona"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-regione-marche.jpg" alt="Regione Marche"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-adsp.jpg" alt="Autorità di Sistema Portuale"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-ministero-della-cultura.jpg" alt="Ministero della Cultura"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-Ente-Parco-Regionale-Conero.jpg" alt="Ente Parco Regionale del Conero"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-marche-teatro.jpg" alt="Marche Teatro"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-fondazione-marche-cultura.jpg" alt="Fondazione Marche Cultura"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-dorica-port-services.jpg" alt="Dorica Port Services"></div>
+            <div class="splogo"><img src="asset/loghi_sponsor/logo-trasporti.jpg" alt="Trasporti"></div>
+          </div>
+        </div>
+        <div id="ticket-table"></div>
+        <div class="pad" style="padding-top:0">
+          <button class="appbtn" style="margin-top:32px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px">Acquista i biglietti <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+        </div>
+      </div>
+
+      <!-- LIBERA PRATICA -->
+      <div class="appscreen" id="s-libera">
+        <div id="lp-locked" class="block" style="position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;color:#000">
+          <div style="transform:translateY(250px)">
+            <p class="kicker" style="opacity:.75;color:#000">Ancora in contumacia</p>
+            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;margin-top:16px;line-height:1.1;color:#000">La tua Libera<br>Pratica ti attende</div>
+            <p style="font-size:16px;font-weight:400;line-height:1.1;opacity:.85;margin-top:16px;color:#000">Completa la soglia minima — un attracco per ciascuna delle quattro macro-aree — per essere ammesso.</p>
+          </div>
+          <button class="appbtn" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);margin:0;width:calc(75% - 4px);padding:12px 16px;justify-content:center" onclick="go('sigillo')">Vai al Sigillo <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+        </div>
+        <div id="lp-granted" class="block bordeaux" style="display:none">
+          <div class="cert">
+            <p class="ct-k">Porto di Ancona · MMXXVIII</p>
+            <svg class="ct-mark" viewBox="0 0 100 100"><g fill="#fff"><rect x="45.6" y="9" width="8.8" height="82"/><rect x="9" y="45.6" width="82" height="8.8"/><rect x="45.6" y="9" width="8.8" height="82" transform="rotate(45 50 50)"/><rect x="45.6" y="9" width="8.8" height="82" transform="rotate(-45 50 50)"/></g></svg>
+            <div class="ct-title notch">Libera Pratica</div>
+            <div class="ct-body">Si concede a <span class="notch">Ospite del Mondo</span> l'ammissione in questa città, cessata la contumacia e visitati mare e parco. Da questo giorno è dichiarato cittadino temporaneo di «Questo Adesso».</div>
+            <p class="ct-date">Rilasciato alla Mole · 14 giugno</p>
+          </div>
+          <div class="imgph" style="height:150px;margin:0 -18px"><svg viewBox="0 0 393 150" preserveAspectRatio="xMidYMid slice"><rect width="393" height="150" fill="#000000" opacity=".92"/><path d="M40 118 L100 118 L100 96 L136 96 L136 118 L360 118 L360 150 L40 150Z" fill="#FFFFFF" opacity=".18"/></svg></div>
+          <div class="pad" style="background:var(--paper);color:var(--ink);margin:0 -18px -22px;padding:22px 18px">
+            <p style="text-align:center;font-size:16px" class="notch">Andara in pace, sei di casa.</p>
+          </div>
+        </div>
+      </div>
+
+    <div class="pagefooter">
+      <button class="pf-link" onclick="go('libera')">Libera pratica</button>
+      <button class="pf-link" onclick="go('sigillo')">Sigillo</button>
+      <button class="pf-link" onclick="go('percorsi')">Percorsi</button>
+      <button class="pf-link" onclick="go('mappa')">Mappa</button>
+      <button class="pf-link" onclick="go('biglietti')">Biglietti</button>
+      <button class="pf-link" onclick="go('regolamento')">Regolamento</button>
+      <div class="pf-legal"><span>Privacy</span><span>© 2028 Libera Pratica — Ancona</span></div>
+    </div>
+
+    <div class="areapick-overlay" id="areaPickOverlay" onclick="closeAreaPick()">
+      <div class="areapick-sheet" onclick="event.stopPropagation()">
+        <p style="font-size:16px;font-weight:400;line-height:1.1">In quale area hai attraccato?</p>
+        <div id="areaPickList"></div>
+      </div>
+    </div>
+
+    </div><!-- /viewport -->
+
+<div class="gridlayer" id="gridlayer">
+  <div class="cols"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="rows"></div>
+</div>
+<button class="gridtoggle" onclick="document.body.classList.toggle('grid-off')">Griglia on/off</button>
+
+<script>
+var AREAS={
+  mare:{name:'Questo Mare',color:'var(--blu)',hex:'#005FA0'},
+  maestra:{name:'Via Maestra',color:'var(--rosso)',hex:'#D82E1D'},
+  parco:{name:'Adesso Parco',color:'var(--verde)',hex:'#3E8638'},
+  culturale:{name:'Mare Culturale',color:'var(--giallo)',hex:'#F8B217'}
+};
+function areaIcon(key){
+  var m={
+    mare:'<path d="M3 13c2 0 2-3 4-3s2 3 4 3 2-3 4-3 2 3 4 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    maestra:'<path d="M6 20V9l6-5 6 5v11" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 20h12M9 20v-6h6v6" fill="none" stroke="currentColor" stroke-width="1.6"/>',
+    parco:'<path d="M5 13c0-6 5-9 13-9-1 9-4 13-13 13 0-2 1-3 2-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    culturale:'<g fill="currentColor"><rect x="10.8" y="3" width="2.4" height="18"/><rect x="3" y="10.8" width="18" height="2.4"/><rect x="10.8" y="3" width="2.4" height="18" transform="rotate(45 12 12)"/><rect x="10.8" y="3" width="2.4" height="18" transform="rotate(-45 12 12)"/></g>'
+  };
+  return '<svg width="20" height="20" viewBox="0 0 24 24">'+m[key]+'</svg>';
+}
+function timeIcon(){return '<svg width="15" height="15" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';}
+function arrowIcon(){return '<span class="material-symbols-outlined" style="font-size:22px">arrow_forward</span>';}
+
+var ROUTES=[
+  {id:'contumacia',title:'La contumacia gentile',subtitle:"<span class='notch'>Spettar</span> e capire — l'attesa raccontata da chi la costruì.",narratore:'Vanvitelli',minuti:60,aree:['culturale','mare'],heroArea:'culturale',
+   desc:"Prima di essere ammessi, si spettava (aspettava). La Mole custodisce ancora il tempo sospeso della quarantena — un cortile, una sala, una banchina. Venir piano, sabir con calma: qui il rito comincia dal silenzio, non dal movimento.",
+   tappe:[{name:'Mole Vanvitelliana — cortile',area:'culturale',lng:13.5044,lat:43.6144},{name:'Lazzaretto — sale espositive',area:'culturale',lng:13.5040,lat:43.6146},{name:'Banchina del sale',area:'mare',lng:13.5031,lat:43.6153}]},
+  {id:'guasco',title:'Il fiato del Guasco',subtitle:'<span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.',narratore:'Ciriaco',minuti:110,aree:['parco','maestra'],heroArea:'parco',
+   desc:'Il percorso più lungo, per chi non ha fretta. Si sale tra il verde del Cardeto fino al Duomo, makach corse, con la città che si apre sotto di te a ogni tappa. Mira — guarda quanto cresce la vista salendo.',
+   tappe:[{name:'Parco del Cardeto',area:'parco',lng:13.5194,lat:43.6218},{name:'Colle Guasco',area:'parco',lng:13.5104,lat:43.6258},{name:'Duomo di San Ciriaco',area:'maestra',lng:13.5102,lat:43.6253},{name:'Teatro delle Muse',area:'maestra',lng:13.5101,lat:43.6196},{name:'Mercato coperto',area:'maestra',lng:13.5141,lat:43.6185}]},
+  {id:'sale',title:'La rotta del sale',subtitle:'<span class="notch">Servir</span> il porto — raccontato da chi lo ha disegnato.',narratore:'Corelli',minuti:80,aree:['mare','parco'],heroArea:'mare',
+   desc:"Dal molo alla banchina, dove le merci aspettavano il permesso di entrare in città. Trabajar e commerciare, danara e destino si intrecciavano proprio qui, sul confine tra il mare e la città.",
+   tappe:[{name:"Molo d'attracco",area:'mare',lng:13.5014,lat:43.6142},{name:'Arco di Traiano',area:'mare',lng:13.5065,lat:43.6253},{name:'Parco del Cardeto (ingresso mare)',area:'parco',lng:13.5220,lat:43.6205},{name:'Faro vecchio',area:'parco',lng:13.5145,lat:43.6233}]}
+];
+
+var TICKETS=[
+  {t:'Percorso singolo',s:'4 tappe mappa + audio-racconto del narratore',p:'8 €'},
+  {t:'Percorso + evento',s:'Percorso singolo + ingresso a 1 evento di palinsesto agganciato (anche serale)',p:'14 €'},
+  {t:'La contumacia gentile',s:'Percorso completo + apertura serale della Mole',p:'16 €'},
+  {t:'Il fiato del Guasco',s:'Percorso completo + concerto al tramonto',p:'18 €'},
+  {t:'La rotta del sale',s:'Percorso completo + mercato serale del pescato',p:'15 €'},
+  {t:'Pass «Questo Adesso»',s:'Tutti e 3 i percorsi + 3 eventi agganciati, valido 7 giorni',p:'38 €'},
+  {t:'Pass famiglia',s:'2 adulti + fino a 2 minori · come Pass «Questo Adesso», tariffa cumulativa',p:'95 €'},
+  {t:'Riduzione under 18 / over 65',s:'Su qualunque prodotto sopra',p:'−30%'},
+  {t:'Libera Pratica',s:'Certificato finale di ammissione — non è mai in vendita',p:'Incluso'}
+];
+
+var MAPPA_CARDS=[
+  {area:'mare',t:'Questo mare',d:'<span class="notch">Venir</span>, cittadino: qui il porto ti ha accolto. Segui la costa e ritrova il molo da cui tutto è cominciato.'},
+  {area:'maestra',t:'Via Maestra',d:'<span class="notch">Andara</span> per la città: qui il cammino si fa strada vera, tra piazze e botteghe che per secoli hanno servito chi arrivava dal mare.'},
+  {area:'parco',t:'Adesso Parco',d:'Qui il fiato della città rallenta. <span class="notch">Makach</span> fretta — solo verde, salite dolci, il colle che guarda il porto.'},
+  {area:'culturale',t:'Mare Culturale',d:'Il Lazzaretto, i musei, i teatri: il patrimonio che Ancona ha tenuto in <span class="notch">contumacia</span> per te, pronto ora a essere vissuto.'}
+];
+
+var ATTI=[
+  {t:'Visita un luogo per ognuna delle quattro aree',b:'Ancona è divisa in quattro macro-aree: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per ottenere la Libera Pratica ti basta un attracco in ciascuna — non servono quattro tappe nella stessa zona.'},
+  {t:'Come si registra un attracco',b:"Arriva al luogo. L'app lo riconosce da sola quando sei vicino, oppure inquadra il QR che trovi sul posto. Fatto: quel luogo è tuo."},
+  {t:'I percorsi ti aiutano, non ti obbligano',b:'Se non sai da dove iniziare, segui uno dei tre percorsi curati: ti accompagnano tra le tappe con un racconto e una guida. Ma puoi anche scegliere da solo, luogo per luogo, seguendo solo la tua curiosità.'},
+  {t:'Non serve completare un percorso intero',b:"Puoi prendere una tappa da un percorso e una da un altro. L'unica regola è coprire le quattro aree, in qualunque ordine, con qualunque combinazione."},
+  {t:'Quando ottieni la Libera Pratica',b:'Appena hai un attracco in ognuna delle quattro aree, il sigillo si chiude da solo. La tua Libera Pratica è pronta: scaricala, condividila, portala con te.'}
+];
+
+var attracchi=[];
+var extraPool={mare:['Arco Clementino'],maestra:['Teatro delle Muse'],parco:['Passetto'],culturale:['Lazzaretto — sale espositive','Mercato delle Erbe']};
+var currentRouteId=null;
+
+function go(id,param){
+  document.querySelectorAll('.appscreen').forEach(function(s){s.classList.remove('on')});
+  if(id==='dettaglio'){ currentRouteId=param||currentRouteId||ROUTES[0].id; renderDettaglio(currentRouteId); }
+  var el=document.getElementById('s-'+id); if(el){el.classList.add('on')}
+  var vp=document.getElementById('viewport'); if(vp){vp.scrollTop=0}
+  toggleMenu(false);
+  if(id==='mappa'){ initOsmMap(); setTimeout(function(){ if(osmMap) osmMap.resize() }, 0); }
+  if(id==='dettaglio'){
+    initDetMap();
+    var routeForMap=ROUTES.filter(function(x){return x.id===currentRouteId})[0];
+    setTimeout(function(){ if(detMap){ detMap.resize(); renderDetMapPins(routeForMap) } }, 0);
+  }
+  var hash='#'+id+(id==='dettaglio'?'/'+currentRouteId:'');
+  if(location.hash!==hash) history.pushState(null,'',hash);
+}
+function syncFromHash(){
+  var h=(location.hash||'#home').slice(1).split('/');
+  go(h[0],h[1]);
+}
+window.addEventListener('popstate',syncFromHash);
+function toggleMenu(force){
+  var header=document.getElementById('appheader');
+  var open = force!==undefined ? !!force : !header.classList.contains('open');
+  header.classList.toggle('open', open);
+  document.getElementById('burgerBtn').setAttribute('aria-expanded', String(open));
+}
+function toggleIntro(force){
+  var bar=document.getElementById('introBar');
+  var open = force!==undefined ? !!force : !bar.classList.contains('open');
+  bar.classList.toggle('open', open);
+  var iframe=bar.querySelector('.introvideo');
+  if(open){ if(!iframe.dataset.loaded){ iframe.src=iframe.dataset.src; iframe.dataset.loaded='1'; } }
+  else { iframe.src=''; iframe.dataset.loaded=''; }
+}
+
+/* ---- Percorsi ---- */
+function renderPercorsiList(){
+  var el=document.getElementById('percorsi-list'); el.innerHTML='';
+  ROUTES.forEach(function(r){
+    var b=document.createElement('button'); b.className='routerow';
+    b.innerHTML='<h3 class="rr-t">'+r.title+'</h3><p class="rr-s">'+r.subtitle+'</p>'+
+      '<div class="rr-row"><div class="rr-meta"><span>'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+' tappe</span></div>'+arrowIcon()+'</div>';
+    b.onclick=function(){go('dettaglio',r.id)};
+    el.appendChild(b);
+  });
+}
+function renderDettaglio(id){
+  var r=ROUTES.filter(function(x){return x.id===id})[0]||ROUTES[0];
+  document.getElementById('det-title').textContent=r.title;
+  document.getElementById('det-desc').textContent=r.desc;
+  var sw=document.getElementById('det-swatch'); sw.style.background=AREAS[r.heroArea].color;
+  document.getElementById('det-swatch-label').textContent=AREAS[r.heroArea].name;
+  var chips=document.getElementById('det-chips'); chips.innerHTML='';
+  r.aree.forEach(function(a){
+    var s=document.createElement('span'); s.className='areachip'; s.style.color=AREAS[a].color;
+    s.textContent=AREAS[a].name; chips.appendChild(s);
+  });
+  var meta=document.getElementById('det-meta'); meta.style.background=AREAS[r.heroArea].color;
+  meta.innerHTML='<span style="display:inline-flex;align-items:center;gap:6px">'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+' tappe</span>';
+  var tp=document.getElementById('det-tappe'); tp.innerHTML='';
+  r.tappe.forEach(function(t,i){
+    var li=document.createElement('li'); li.className='tappe-item';
+    li.innerHTML='<span class="tp-t">'+(i+1)+'. '+t.name+'</span><svg class="tp-icon" viewBox="0 0 141.73 141.73" style="color:'+AREAS[t.area].color+'">'+AREA_ICON_SVG[t.area]+'</svg>';
+    tp.appendChild(li);
+  });
+  document.getElementById('det-cta').onclick=function(){attraccaDaPercorso()};
+  currentRouteId=id;
+}
+function attraccaDaPercorso(){
+  var r=ROUTES.filter(function(x){return x.id===currentRouteId})[0]; if(!r)return;
+  var first=r.tappe[0];
+  addAttracco(first.name, first.area);
+  go('sigillo');
+}
+
+/* ---- Regolamento ---- */
+function renderRegolamento(){
+  var romans=['I','II','III','IV','V'];
+  var el=document.getElementById('regolamento-atti'); el.innerHTML='';
+  ATTI.forEach(function(a,i){
+    var d=document.createElement('div');
+    d.style.cssText='background:var(--paper);color:var(--ink);border-top:'+(i===0?'none':'1px solid #000')+';padding:16px 20px 16px';
+    d.innerHTML='<p style="font-weight:400;font-size:24px;line-height:1.1">Atto '+romans[i]+'</p>'+
+      '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:8px">'+a.t+'</p>'+
+      '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:40px">'+a.b+'</p>';
+    el.appendChild(d);
+  });
+}
+
+/* ---- Mappa ---- */
+/* stile gratuito senza API key (OpenFreeMap, hosting pubblico stabile) */
+var OSM_STYLE_URL='https://tiles.openfreemap.org/styles/liberty';
+var osmMap=null;
+/* punti d'attracco per macro-area, elenchi definitivi forniti. Coordinate da OpenStreetMap;
+   dove segnalato in "note" sono posizioni approssimate (luogo non ancora mappato puntualmente). */
+var PINS=[
+  {area:'mare', name:'Mole Vanvitelliana', note:'Punto di attracco iniziale, sede del totem', lng:13.5044, lat:43.6144},
+  {area:'mare', name:'Porto Antico', note:'Con la Fontana dei Due Soli di Enzo Cucchi', lng:13.5026, lat:43.6249},
+  {area:'mare', name:'Arco di Traiano', lng:13.5065, lat:43.6253},
+  {area:'mare', name:'Arco Clementino', note:'Molo Clementino', lng:13.5050, lat:43.6252},
+  {area:'mare', name:'Porta Pia', note:"Ingresso simbolico adiacente alla Mole", lng:13.5050, lat:43.6154},
+  {area:'mare', name:'Casa del Capitano', note:'Futuro planetario didattico', lng:13.5093, lat:43.6237},
+  {area:'mare', name:'Marina Dorica', note:'Porto turistico', lng:13.4853, lat:43.6099},
+  {area:'mare', name:'Mercato delle Erbe', note:'Vicino al Mandracchio — riqualificato, spazi eventi legati alla cucina di mare', lng:13.5141, lat:43.6185},
+  {area:'maestra', name:'Duomo di San Ciriaco', lng:13.5102, lat:43.6253},
+  {area:'maestra', name:'Pinacoteca Civica Francesco Podesti', lng:13.5111, lat:43.6209},
+  {area:'maestra', name:'Anfiteatro Romano', lng:13.5124, lat:43.6247},
+  {area:'maestra', name:'Museo Archeologico Nazionale delle Marche', note:'Palazzo Ferretti — MAN Marche', lng:13.5107, lat:43.6234},
+  {area:'maestra', name:'Biblioteca Comunale Luciano Benincasa', lng:13.5108, lat:43.6229},
+  {area:'maestra', name:'Museo della Città', note:'Spazio Presente', lng:13.5119, lat:43.6195},
+  {area:'maestra', name:'Palazzo degli Anziani', note:'Futuro Urban Center', lng:13.5108, lat:43.6227},
+  {area:'maestra', name:'Teatro delle Muse', lng:13.5101, lat:43.6196},
+  {area:'maestra', name:'Casa Francesco Podesti', note:'Quartiere Capodimonte', lng:13.5098, lat:43.6163},
+  {area:'maestra', name:'Rifugio Birarelli', lng:13.5120, lat:43.6239},
+  {area:'maestra', name:'Ex Cobianchi', note:'Futuro co-working', lng:13.5131, lat:43.6179},
+  {area:'maestra', name:'Chiesa del SS. Sacramento', lng:13.5096, lat:43.6187},
+  {area:'maestra', name:'Santa Maria della Piazza', note:'Con i mosaici paleocristiani', lng:13.5106, lat:43.6205},
+  {area:'maestra', name:'Loggia dei Mercanti', lng:13.5098, lat:43.6201},
+  {area:'parco', name:'Parco del Cardeto', lng:13.5194, lat:43.6218},
+  {area:'parco', name:'Polveriera Castelfidardo', note:'Futuro hub culturale', lng:13.5199, lat:43.6215},
+  {area:'parco', name:'Cimitero Ebraico', note:'600 anni nel 2028 — posizione approssimata (via Astagno)', lng:13.5078, lat:43.6149},
+  {area:'parco', name:'Casa delle Farfalle', note:'Progetto futuro nel Cardeto — posizione approssimata', lng:13.5194, lat:43.6218},
+  {area:'parco', name:'Passetto', note:'Scalinata, Monumento ai Caduti, grotte, laghetti', lng:13.5330, lat:43.6146},
+  {area:'parco', name:'Porta Pietralacroce', note:'Una delle quattro porte del parco', lng:13.5407, lat:43.6023},
+  {area:'parco', name:'Porta Camerano', note:'Una delle quattro porte del parco — posizione approssimata (centro di Camerano)', lng:13.5476, lat:43.5235},
+  {area:'parco', name:'Porta Numana', note:'Una delle quattro porte del parco — posizione approssimata (centro di Numana)', lng:13.6140, lat:43.4924},
+  {area:'parco', name:'Porta Sirolo', note:'Una delle quattro porte del parco — posizione approssimata (centro di Sirolo)', lng:13.6066, lat:43.5191},
+  {area:'parco', name:'Baia di Portonovo', note:'Percorso pedonale in costruzione', lng:13.5931, lat:43.5619},
+  {area:'parco', name:'Abbazia di Santa Maria di Portonovo', lng:13.6021, lat:43.5609},
+  {area:'culturale', name:'Mole Vanvitelliana', note:'Ospita anche progetti mare e innovazione/giovani — Next Frame Lab, Cinematica', lng:13.5044, lat:43.6144},
+  {area:'culturale', name:'Caserma Villarey', note:'Futuro Museo di Ateneo UNIVPM', lng:13.5169, lat:43.6205},
+  {area:'culturale', name:'Area ex Mattatoio', note:'Spazio Carta, Spazio Culture, AncoHousing', lng:13.5142, lat:43.6081},
+  {area:'culturale', name:"Piazza d'Armi", note:'Mercato, quartiere Piano San Lazzaro', lng:13.5078, lat:43.6007},
+  {area:'culturale', name:'Villa Colonnelli', note:'Posatora — residenze per artisti', lng:13.4890, lat:43.6024},
+  {area:'culturale', name:'Stadio Dorico', note:'Futuro hub cultura sportiva', lng:13.5299, lat:43.6169}
+];
+var mapPinEls=[];
+function addMapPins(){
+  mapPinEls=[];
+  PINS.forEach(function(p){
+    var el=document.createElement('div');
+    el.className='map-pin pin';
+    var dot=document.createElement('div');
+    dot.className='dot';
+    dot.style.background=AREAS[p.area].hex;
+    el.appendChild(dot);
+    el.onclick=function(){ showPin(p.area, p.name, p.note, el) };
+    new maplibregl.Marker({element:el}).setLngLat([p.lng, p.lat]).addTo(osmMap);
+    mapPinEls.push({area:p.area, el:el});
+  });
+  filterPinsByArea(MAPPA_CARDS[0].area);
+}
+/* mostra solo i pin dell'area corrispondente al rettangolo attivo in "areacards" */
+function filterPinsByArea(area){
+  mapPinEls.forEach(function(m){ m.el.style.display = (m.area===area) ? 'block' : 'none' });
+}
+function initOsmMap(){
+  if(osmMap || typeof maplibregl==='undefined') return;
+  var el=document.getElementById('osmMap'); if(!el) return;
+  osmMap=new maplibregl.Map({
+    container:el,
+    style:OSM_STYLE_URL,
+    center:[13.5189, 43.6158],
+    zoom:13
+  });
+  osmMap.addControl(new maplibregl.NavigationControl(), 'top-right');
+  addMapPins();
+}
+/* mappa del dettaglio percorso: un pin per ogni tappa, con vista inquadrata su tutte */
+var detMap=null;
+var detMapMarkers=[];
+function initDetMap(){
+  if(detMap || typeof maplibregl==='undefined') return;
+  var el=document.getElementById('det-map'); if(!el) return;
+  detMap=new maplibregl.Map({
+    container:el,
+    style:OSM_STYLE_URL,
+    center:[13.5119, 43.6195],
+    zoom:13
+  });
+  detMap.addControl(new maplibregl.NavigationControl(), 'top-right');
+}
+function renderDetMapPins(route){
+  if(!detMap) return;
+  detMapMarkers.forEach(function(m){ m.remove() });
+  detMapMarkers=[];
+  var bounds=new maplibregl.LngLatBounds();
+  route.tappe.forEach(function(t){
+    if(t.lng==null || t.lat==null) return;
+    var el=document.createElement('div');
+    el.className='map-pin pin';
+    var dot=document.createElement('div');
+    dot.className='dot';
+    dot.style.background=AREAS[t.area].hex;
+    el.appendChild(dot);
+    detMapMarkers.push(new maplibregl.Marker({element:el}).setLngLat([t.lng, t.lat]).addTo(detMap));
+    bounds.extend([t.lng, t.lat]);
+  });
+  if(!bounds.isEmpty()) detMap.fitBounds(bounds, {padding:40, maxZoom:16});
+}
+var AREA_ICON_SVG={
+  mare:'<rect class="aic" x="21.6" y="3.91" width="98.54" height="13.58"/><rect class="aic" x="21.6" y="31.81" width="98.54" height="15.04"/><rect class="aic" x="15.66" y="121.92" width="29.82" height="15.9"/><rect class="aic" x="96.25" y="121.92" width="29.82" height="15.9"/><polyline class="aic" points="5.84 137.82 9.72 137.82 15.66 137.82"/><polyline class="aic" points="135.89 137.82 132.01 137.82 126.07 137.82"/><polyline class="aic" points="96.25 137.82 87 137.82 54.73 137.82 45.48 137.82"/><line class="aic" x1="40.51" y1="121.92" x2="40.51" y2="46.85"/><line class="aic" x1="21.6" y1="121.92" x2="21.6" y2="46.85"/><line class="aic" x1="120.14" y1="121.92" x2="120.14" y2="46.85"/><polygon class="aic" points="132.01 17.5 126.07 24.66 120.14 31.81 21.6 31.81 21.6 31.55 15.66 24.52 9.72 17.5 132.01 17.5"/><line class="aic" x1="21.7" y1="31.67" x2="21.6" y2="31.55"/><line class="aic" x1="101.22" y1="121.92" x2="101.22" y2="46.85"/><path class="aic" d="M66.71,58.9h8.3c6.62,0,11.99,5.37,11.99,11.99v66.93h-32.28v-66.93c0-6.62,5.37-11.99,11.99-11.99Z"/>',
+  maestra:'<rect class="aic" x="2.5" y="122.71" width="136.73" height="16.02"/><path class="aic" d="M9.81,121.54c-1.53-1.42-5.28-4.22-5.27-9.82,0-4.66,3.87-9.82,9.79-10.25h41.26c-.04-3.37.33-10.78,4.75-18.67,1.55-2.77,5.35-8.7,12.61-13.26.11-.07.27-.17.47-.29,3.91-2.37,14.79-7.52,27.88-4.5,12.51,2.89,19.43,11.48,22.05,14.83,6.63,8.49,8.13,17.1,8.5,19.54,1.62,10.95-1.65,19.5-3.19,22.94"/><path class="aic" d="M101.65,92.28c-3.81,1.02-11.8,3.84-18.41,13.52-4.49,6.58-5.98,11.89-6.23,15.14"/><path class="aic" d="M15.49,110.27c-.62.34-1.78,1.07-2.24,2.33-.21.57-.25,1.09-.23,1.45.06,2.3.12,4.59.18,6.89"/><path class="aic" d="M24.7,110.27c-.62.34-1.78,1.07-2.24,2.33-.21.57-.25,1.09-.23,1.45.06,2.3.12,4.59.18,6.89"/><path class="aic" d="M46.23,99.98c.02-1.78-.08-4.53-.85-7.74-.79-3.34-1.8-5.12-3.18-8.7-1.52-3.94-2.54-6.7-3.08-10.08-.45-2.82-1.35-8.46,1.38-14.43,1.74-3.82,4.36-6.42,6.47-8.06"/><path class="aic" d="M41.62,57.03c-2.58,3.19-6.3,4.91-7.91,4.98-1.86.08-4.12-.75-4.99-2.44-.47-.93-.25-1.56-.21-3.92.03-2.02-.1-3.65-.21-4.67"/><path class="aic" d="M58.64,36.23c1.63,2.47,2.88,5.6,3,10.04.08,2.91.65,5.26-5.2,13.38-5.17,7.17-5.27,10.42-5.32,12.2-.07,2.22-.15,6.47,1.55,13.25.94,3.73,3.25,9.91,2.91,16.38"/><path class="aic" d="M55.85,28.04c1.48-.5,7.1-2.19,11.98.69,5.43,3.2,6.91,8.21,7.46,12.33.71,5.29-.18,8.97-1.67,14.81-.81,3.18-3.33,6.9-3.56,11.33-.12,2.2-.2,2.02.05,3.23"/><path class="aic" d="M51.72,21.02c1.07-.93,8.45-8,18.98-5.76,7.1,1.51,12.04,6.46,13.51,8.24,6.02,7.3,5.58,15.2,5.54,21.04-.06,9.01-2.05,15.2-4.38,19.88"/><path class="aic" d="M32.57,50.65c-.72.25-1.97.57-3.45.32-2.94-.49-4.59-2.85-5.82-4.6-1.04-1.48-2.04-2.92-1.73-4.6.15-.82.57-1.45,1.66-2.62,2.01-2.17,3.01-2.65,5.05-4.48,1.45-1.29,2.65-2.61,5.05-5.24,1.14-1.25,1.76-1.98,2.11-2.37,1.66-1.86,4.48-4.29,9.53-6.72-.32-1.34-.64-3.59.14-6.06,1.27-4.03,4.69-6.08,7.02-7.43,10.59-6.15,22.88-3.14,23.82-2.89,1.8.47,9.38,2.32,16.17,9.67,1.61,1.74,6.07,6.89,7.92,15.31.67,3.06,1.27,2.46,1.87,12.54.5,8.44.54,10.47-.45,14.78-1.03,4.48-1.74,5.84-2.6,8.02"/><path class="aic" d="M38.98,32.3c.23-.83,6.2-.08,6.2-.08h0s-.62,1.43-1.28,1.9c-1.45,1.02-5.11-1.14-4.92-1.82Z"/>',
+  parco:'<polyline class="aic" points="137.43 4.92 83.98 15.01 75.6 36.74 57.1 44.91 46.56 90.94 34.73 96.75 23.16 131.4"/><polyline class="aic" points="83.98 15.01 96.68 24.91 77.32 78.04"/><polyline class="aic" points="99.04 76.53 110.87 64.49 115.6 36.95 135.18 28.78"/><path class="aic" d="M1.82,133.1c13.59.32,23.46-1.78,29.7-4.17,12.88-4.93,23.38-13.86,28.6-17.98,7.77-6.14,9.47-8.03,16.56-12.91,5.02-3.45,11.76-7.22,20.92-7.56,4.07-.15,11.26.05,17.58,4.76,4,2.99,6.08,6.74,7.1,9.03-1.54-1.07-5.04-3.2-9.89-3.44-1.71-.08-8.63-.43-13.12,4.73-4.55,5.24-3.16,12.2-3.01,12.91,2.49,11.49,17.94,14.57,21.09,15.11,8.88,1.51,18.11-.48,22.58-2.27"/><path class="aic" d="M39.11,136.81c12.88-4.93,23.38-13.86,28.6-17.98,7.77-6.14,9.47-8.03,16.56-12.91"/>',
+  culturale:'<polygon class="aic" points="70.87 33.89 15.52 74.1 36.66 139.16 105.07 139.16 126.21 74.1 70.87 33.89"/><polygon class="aic" points="102.58 25.61 102.58 40.68 70.87 17.64 39.15 40.68 39.15 25.61 70.87 2.57 102.58 25.61"/><polygon class="aic" points="70.87 55.75 36.74 80.54 49.77 120.67 91.96 120.67 105 80.54 70.87 55.75"/><line class="aic" x1="73.59" y1="81.73" x2="73.88" y2="81.73"/>'
+};
+function renderMappaCards(){
+  var el=document.getElementById('mappa-cards'); el.innerHTML='';
+  MAPPA_CARDS.forEach(function(c,i){
+    var d=document.createElement('div'); d.className='areacard'; d.dataset.area=c.area; d.style.background=AREAS[c.area].color;
+    var nums='';
+    for(var n=1;n<=4;n++){ nums+='<span'+(n===i+1?' class="on"':'')+' onclick="scrollToAreaCard('+(n-1)+')">'+n+'</span>'; }
+    d.innerHTML='<div class="ac-top"><div class="ac-t">'+c.t+'</div><div class="ac-d">'+c.d+'</div></div>'+
+      '<div class="ac-bottom"><svg class="ac-icon" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[c.area]+'</svg><div class="ac-nums">'+nums+'</div></div>';
+    el.appendChild(d);
+  });
+  setupAreaCardObserver();
+}
+var areaCardObserver=null;
+function setupAreaCardObserver(){
+  var container=document.getElementById('mappa-cards');
+  if(!container) return;
+  if(areaCardObserver) areaCardObserver.disconnect();
+  areaCardObserver=new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && entry.intersectionRatio>=0.6) filterPinsByArea(entry.target.dataset.area);
+    });
+  }, {root:container, threshold:0.6});
+  container.querySelectorAll('.areacard').forEach(function(card){ areaCardObserver.observe(card) });
+}
+function scrollToAreaCard(idx){
+  var el=document.getElementById('mappa-cards');
+  var card=el.children[idx];
+  if(card) card.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+}
+function showPin(area,name,note,el){
+  var card=document.getElementById('pincard');
+  document.getElementById('pin-name').textContent=name;
+  document.getElementById('pin-note').textContent=note||'';
+  card.style.display='flex'; card.style.background=AREAS[area].hex;
+  document.querySelectorAll('.map-pin').forEach(function(c){c.classList.remove('on')});
+  el.classList.add('on');
+}
+
+/* ---- Biglietteria ---- */
+function renderTickets(){
+  var el=document.getElementById('ticket-table'); el.innerHTML='';
+  TICKETS.forEach(function(k,i){
+    var d=document.createElement('div'); d.className='ticket-row '+(i%2===0?'a':'b');
+    d.innerHTML='<div><div class="tk-t">'+k.t+'</div><div class="tk-s">'+k.s+'</div></div><div class="tk-p">'+k.p+'</div>';
+    el.appendChild(d);
+  });
+}
+
+/* ---- Sigillo / attracchi ---- */
+var STAMP_SRC={
+  mare:'asset/icone/icone-questomare-timbro.svg',
+  maestra:'asset/icone/icone-viamaestra-timbro.svg',
+  parco:'asset/icone/icone-adessoparco-timbro.svg',
+  culturale:'asset/icone/icone-marecultura-timbro.svg'
+};
+function addAttracco(name,area){
+  attracchi.push({name:name,area:area,time:'ora'});
+  renderAttracchi(); updateSigillo(); showStamp(area);
+}
+function showStamp(area){
+  var slot=document.getElementById('stampSlot');
+  var img=document.createElement('img');
+  img.src=STAMP_SRC[area]||STAMP_SRC.mare;
+  img.alt='Timbro';
+  var maxLeft=Math.max(0, slot.clientWidth-136);
+  var maxTop=Math.max(0, slot.clientHeight-136);
+  img.style.left=(Math.random()*maxLeft)+'px';
+  img.style.top=(Math.random()*maxTop)+'px';
+  img.style.setProperty('--rot', (Math.random()*40-20).toFixed(1)+'deg');
+  slot.appendChild(img);
+  requestAnimationFrame(function(){img.classList.add('show')});
+  makeStampDraggable(img, slot);
+}
+function makeStampDraggable(img, slot){
+  var startX, startY, origLeft, origTop, dragging=false;
+  function down(e){
+    dragging=true; img.classList.add('dragging');
+    var t=e.touches?e.touches[0]:e;
+    startX=t.clientX; startY=t.clientY;
+    origLeft=parseFloat(img.style.left)||0;
+    origTop=parseFloat(img.style.top)||0;
+    e.preventDefault();
+  }
+  function move(e){
+    if(!dragging)return;
+    var t=e.touches?e.touches[0]:e;
+    var dx=t.clientX-startX, dy=t.clientY-startY;
+    var maxLeft=Math.max(0, slot.clientWidth-img.offsetWidth);
+    var maxTop=Math.max(0, slot.clientHeight-img.offsetHeight);
+    img.style.left=Math.min(maxLeft, Math.max(0, origLeft+dx))+'px';
+    img.style.top=Math.min(maxTop, Math.max(0, origTop+dy))+'px';
+    e.preventDefault();
+  }
+  function up(){dragging=false; img.classList.remove('dragging')}
+  img.addEventListener('mousedown', down);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', up);
+  img.addEventListener('touchstart', down, {passive:false});
+  window.addEventListener('touchmove', move, {passive:false});
+  window.addEventListener('touchend', up);
+}
+function renderAttracchi(){
+  var el=document.getElementById('attracchi'); el.innerHTML='';
+  attracchi.forEach(function(a){
+    var d=document.createElement('div'); d.className='attraccorow'; d.style.background=AREAS[a.area].color;
+    d.innerHTML='<div><div class="ar-t">'+a.name+'</div><div class="ar-m"><span style="text-transform:uppercase">Attracco</span> · '+a.time+'</div></div>'+
+      '<svg class="ar-icon" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[a.area]+'</svg>';
+    el.appendChild(d);
+  });
+}
+function areasDone(){
+  var s={}; attracchi.forEach(function(a){s[a.area]=true}); return Object.keys(s);
+}
+function updateSigillo(){
+  var done=areasDone(); var n=done.length;
+  var homeProg=document.getElementById('homeProgNum'); if(homeProg) homeProg.textContent=n;
+  var btn=document.getElementById('stampBtn');
+  var granted=document.getElementById('lp-granted'), locked=document.getElementById('lp-locked');
+  if(n>=4){
+    btn.innerHTML='✓ Ammissione completata'; btn.disabled=true; btn.style.opacity='.5'; btn.style.cursor='default';
+    granted.style.display='block'; locked.style.display='none';
+  } else {
+    granted.style.display='none'; locked.style.display='block';
+  }
+}
+function registerAttracco(){
+  var done=areasDone();
+  var missing=Object.keys(AREAS).filter(function(k){return done.indexOf(k)===-1});
+  if(!missing.length)return;
+  var list=document.getElementById('areaPickList'); list.innerHTML='';
+  missing.forEach(function(k){
+    var b=document.createElement('button'); b.className='areapick-btn'; b.style.color=AREAS[k].color;
+    b.innerHTML='<svg class="aic-wrap" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[k]+'</svg><span>'+AREAS[k].name+'</span>';
+    b.onclick=function(){ pickArea(k) };
+    list.appendChild(b);
+  });
+  document.getElementById('areaPickOverlay').classList.add('show');
+}
+function closeAreaPick(){
+  document.getElementById('areaPickOverlay').classList.remove('show');
+}
+function pickArea(area){
+  var pool=extraPool[area]||['Nuova tappa'];
+  var name=pool.shift()||'Nuova tappa';
+  addAttracco(name,area);
+  closeAreaPick();
+}
+
+/* ---- init ---- */
+renderRegolamento(); renderPercorsiList(); renderMappaCards(); renderTickets(); renderAttracchi();
+renderDettaglio(ROUTES[0].id); updateSigillo();
+syncFromHash();
+
+function sizeLpLocked(){
+  var vp=document.getElementById('viewport'), nav=document.getElementById('appheader'), lp=document.getElementById('lp-locked');
+  if(!vp||!nav||!lp)return;
+  lp.style.minHeight=(vp.clientHeight-nav.offsetHeight)+'px';
+}
+sizeLpLocked();
+window.addEventListener('resize', sizeLpLocked);
+</script>
