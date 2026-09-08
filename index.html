@@ -5,7 +5,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward&icon_names=add&icon_names=check" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,add,check,arrow_downward,share" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
@@ -45,6 +45,8 @@ button{font-family:var(--disp)}
 
 /* header — barra unica fedele a Figma: margine 20px solo a sinistra, filo a destra, altezza 72px (9 righe) */
 .apphead{position:sticky;top:0;z-index:30;color:var(--paper)}
+.viewport:has(#s-libera.on #lp-granted[data-visible]) .apphead{background:var(--bordeaux)}
+.viewport:has(#s-profilo.on) .apphead{background:var(--bordeaux)}
 .ah-bar{position:relative;height:72px;margin-left:20px;background:#000;display:flex;align-items:center;justify-content:flex-start;padding:0}
 .ah-logo{height:36px;width:auto;margin-left:8px;filter:brightness(0) invert(1);cursor:pointer}
 
@@ -124,7 +126,7 @@ button{font-family:var(--disp)}
 .imgph svg{display:block;width:100%;height:100%}
 .duo{display:flex}
 .duo .imgph{flex:1 1 auto;min-width:0}
-.duo .swatch{width:calc(25vw + 14px);flex:0 0 auto}
+.duo .swatch{width:auto;flex:0 0 calc(33.333% - 9.333px)}
 
 .areachip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
   text-transform:uppercase;letter-spacing:.06em;border:2px solid currentColor;padding:8px 13px;margin:0 8px 8px 0}
@@ -189,10 +191,17 @@ button{font-family:var(--disp)}
 .mapbox{position:relative;background:#E7E3DA;flex:0 0 auto}
 .mapbox svg{display:block;width:100%}
 .pin{cursor:pointer}
-.pincard{display:none;align-items:center;justify-content:space-between}
 .map-pin{width:12px;height:12px}
 .map-pin .dot{width:100%;height:100%;border-radius:50%;transition:transform .2s ease}
 .map-pin.on .dot{transform:scale(1.35)}
+
+/* etichetta del pin direttamente sulla mappa (popup MapLibre), al posto della card sotto la mappa */
+.maplibregl-popup-content{padding:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.3);overflow:hidden}
+.maplibregl-popup-close-button{display:none}
+.maplibregl-popup-tip{display:none}
+.map-pin-label{padding:10px 14px;color:#fff;font-family:var(--disp);max-width:220px}
+.map-pin-label .pl-name{font-size:14px;font-weight:400;line-height:1.1}
+.map-pin-label .pl-note{font-size:11px;font-weight:400;line-height:1.2;opacity:.8;margin-top:4px}
 
 .areacards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .areacards::-webkit-scrollbar{height:0}
@@ -213,11 +222,11 @@ button{font-family:var(--disp)}
   transform:scale(.6) rotate(var(--rot,0deg));transition:opacity .35s ease,transform .35s ease}
 .stamp-slot img.show{opacity:1;transform:scale(1) rotate(var(--rot,0deg))}
 
-.areapick-overlay{position:absolute;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;
-  justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s .3s}
+.areapick-overlay{position:fixed;z-index:9600;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;
+  pointer-events:none;transition:opacity .3s ease,visibility 0s .3s}
 .areapick-overlay.show{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .3s ease}
-.areapick-sheet{background:#fff;color:#000;width:100%;padding:20px;box-sizing:border-box;transform:translateY(100%);
-  transition:transform .4s cubic-bezier(.87,0,.13,1)}
+.areapick-sheet{position:absolute;left:0;right:0;bottom:0;background:#fff;color:#000;padding:20px;box-sizing:border-box;
+  transform:translateY(100%);transition:transform .4s cubic-bezier(.87,0,.13,1)}
 .areapick-overlay.show .areapick-sheet{transform:translateY(0)}
 .areapick-btn{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;border-top:1px solid #000;
   padding:16px 0;font-family:var(--disp);font-size:16px;font-weight:400;line-height:1.1;text-align:left;cursor:pointer;color:inherit}
@@ -226,15 +235,41 @@ button{font-family:var(--disp)}
 .areapick-btn .aic-wrap .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
 .stamp-slot img.dragging{cursor:grabbing;transition:none}
 
+/* boot — caricamento + registrazione, prima schermata mostrata all'accesso */
+.bootscreen{position:absolute;inset:0;z-index:9700;background:var(--bordeaux);color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  padding:20px;box-sizing:border-box}
+.boot-logo{width:96px;height:auto;filter:brightness(0) invert(1)}
+.boot-form{width:100%;max-width:320px}
+.boot-field{display:block;width:100%;text-align:left;margin-bottom:24px}
+.boot-field span{display:block;font-size:12px;font-weight:400;opacity:.65;margin-bottom:8px;line-height:1.1}
+.boot-field input,.boot-field select{width:100%;background:transparent;border:none;
+  border-bottom:1.5px solid rgba(255,255,255,.5);color:#fff;font-family:var(--disp);font-size:16px;
+  padding:8px 0;box-sizing:border-box;-webkit-appearance:none;appearance:none;border-radius:0}
+.boot-field select option{color:#000}
+.boot-field input::placeholder{color:rgba(255,255,255,.45)}
+.boot-field input:focus,.boot-field select:focus{outline:none;border-bottom-color:#fff}
+
+/* profilo — righe dati con matita per la modifica inline */
+.pf-edit{background:none;border:none;color:var(--ink);opacity:.55;cursor:pointer;padding:8px;
+  flex:0 0 auto;display:flex;align-items:center;justify-content:center}
+.pf-edit:hover{opacity:1}
+.pf-input{width:100%;background:transparent;border:none;border-bottom:1.5px solid var(--ink);color:var(--ink);
+  font-family:var(--disp);font-size:16px;padding:8px 0 2px;margin-top:8px;box-sizing:border-box;
+  -webkit-appearance:none;appearance:none;border-radius:0}
+.pf-input:focus{outline:none}
+
 .cert{padding:20px 20px 32px;text-align:center;color:#fff}
-.cert .ct-mark{width:120px;height:120px;margin:0 auto 16px}
-.cert .ct-k{font-size:12px;font-weight:400;line-height:1.1;opacity:.7}
+.cert .ct-mark{width:130px;height:auto;display:block;margin:0 auto 36px;filter:brightness(0) invert(1)}
+.cert .ct-k{position:absolute;top:20px;left:0;right:0;font-size:12pt;font-weight:400;line-height:1.1;opacity:1}
 .cert .ct-title{font-size:28px;margin:16px 0 16px}
 .cert .ct-body{font-size:16px;font-weight:400;line-height:1.1;max-width:300px;margin:0 auto}
-.cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;opacity:.7}
+.cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;opacity:.7;margin-top:30px}
 /* footer di navigazione — in fondo alla pagina, non fissa, come su un sito */
 .pagefooter{background:#fff;color:#000}
 #s-dettaglio.on ~ .pagefooter{border-top:1px solid #000}
+#s-libera.on ~ .pagefooter{display:none}
+.viewport.boot-active{overflow:hidden}
 .pf-link{display:block;width:100%;text-align:left;background:none;border:none;color:inherit;cursor:pointer;
   font-family:var(--disp);font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;padding:16px 20px;
   border-bottom:1px solid #000}
@@ -255,7 +290,7 @@ body.grid-off .gridlayer{display:none}
   text-transform:uppercase}
 </style>
 
-<div class="viewport" id="viewport">
+<div class="viewport boot-active" id="viewport">
 
       <div class="apphead" id="appheader">
         <div class="ah-bar">
@@ -271,6 +306,7 @@ body.grid-off .gridlayer{display:none}
               <li><button onclick="go('mappa')">Mappa</button></li>
               <li><button onclick="go('biglietti')">Biglietti</button></li>
               <li><button onclick="go('regolamento')">Regolamento</button></li>
+              <li><button onclick="go('profilo')">Profilo</button></li>
             </ul>
           </div>
         </nav>
@@ -282,8 +318,8 @@ body.grid-off .gridlayer{display:none}
           <p class="h-hero"><span class="notch">Sabir</span>, cittadino del mondo. <span class="notch">Bono viaggio</span> — sei attraccato nel porto di Ancona.</p>
         </div>
         <div class="duo" style="height:152px;margin-top:96px">
-          <div class="imgph" style="flex:0 0 calc(66.667% - 4.667px)"><video src="asset/video/video_ancona_6_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
-          <div class="swatch imgph" style="width:auto;flex:1 1 auto;background:var(--bordeaux)"></div>
+          <div class="imgph"><video src="asset/video/video_ancona_6_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="swatch imgph" style="background:var(--bordeaux)"></div>
         </div>
         <div class="introbar" id="introBar">
           <div class="introhead">
@@ -367,6 +403,30 @@ body.grid-off .gridlayer{display:none}
         </div>
       </div>
 
+      <!-- PROFILO -->
+      <div class="appscreen" id="s-profilo">
+        <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
+          <h2 class="h-title" style="color:#fff">Il tuo profilo</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;opacity:.9;line-height:1.1;width:100%">Questi sono i dati che ci hai lasciato in ammissione: la tua identità di cittadino temporaneo.</p>
+        </div>
+        <div class="duo" style="height:177px">
+          <div class="imgph"><video src="asset/video/video_ancona_1_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="swatch imgph" style="background:#000"></div>
+        </div>
+        <div id="profilo-dati"></div>
+        <div class="pad" style="padding-top:20px">
+          <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="logoutProfilo()">Esci <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+        </div>
+        <div class="ticker">
+          <div class="tickertrack">
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+            <span>Libera Pratica — Ancona 2028</span>
+          </div>
+        </div>
+      </div>
+
       <!-- PERCORSI (lista) -->
       <div class="appscreen" id="s-percorsi">
         <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Percorsi</h2>
@@ -391,7 +451,6 @@ body.grid-off .gridlayer{display:none}
         <div class="duo" style="height:177px">
           <div class="imgph"><video src="asset/video/video_ancona_4_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
           <div class="swatch imgph" id="det-swatch" style="display:flex;align-items:center;justify-content:center">
-            <span id="det-swatch-label" style="color:#fff;font-weight:400;font-size:40px;letter-spacing:.02em;white-space:nowrap;transform:rotate(-90deg)"></span>
           </div>
         </div>
         <div class="pad" style="padding-bottom:8px;padding-top:20px">
@@ -403,7 +462,7 @@ body.grid-off .gridlayer{display:none}
         <div id="det-meta" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:#fff;font-size:16px;font-weight:400;line-height:1.1"></div>
         <ol id="det-tappe" style="list-style:none;margin:8px 0;padding:0"></ol>
         <div class="pad" style="padding-top:20px">
-          <button class="appbtn" id="det-cta" onclick="attraccaDaPercorso()">+ Attracca al primo molo</button>
+          <button class="appbtn" id="det-cta" onclick="attraccaDaPercorso()">Attracca al primo molo <span class="material-symbols-outlined" style="margin-left:10px">add</span></button>
           <button class="appbtn ghost" style="margin-top:8px" onclick="go('biglietti')" id="det-ticket">Biglietto del percorso · 8 €</button>
         </div>
       </div>
@@ -418,7 +477,6 @@ body.grid-off .gridlayer{display:none}
           <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:56px;line-height:1.1">I punti d'attracco per le quattro macro-aree di «Questo Adesso». Mira — guarda dove puoi scendere a terra.</p>
         </div>
         <div class="mapbox" id="osmMap" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
-        <div id="pincard" class="block ink pincard"><div style="max-width:calc(83.333% - 2.333px)"><div style="font-weight:400;font-size:16px;line-height:1.1" id="pin-name"></div><p style="font-size:12px;font-weight:400;line-height:1.1;opacity:.75;margin-top:4px" id="pin-note"></p></div></div>
         <div class="areacards" id="mappa-cards"></div>
       </div>
 
@@ -429,12 +487,12 @@ body.grid-off .gridlayer{display:none}
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px;margin-top:8px">
           <p style="font-size:28px;font-weight:400;line-height:1.1;color:#fff">Attracchi registrati</p>
           <p style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px">Se non appare automaticamente registra manualmente il tuo attracco inserendo poche e semplici informazioni</p>
-          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" id="stampBtn" onclick="registerAttracco()">+ Registra attracco</button>
+          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" id="stampBtn" onclick="registerAttracco()">Registra attracco <span class="material-symbols-outlined" style="margin-left:10px">add</span></button>
         </div>
         <div id="attracchi"></div>
         <div class="duo" style="height:177px">
-          <div class="swatch imgph" style="background:#000"></div>
           <div class="imgph"><video src="asset/video/video_ancona_3_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="swatch imgph" style="background:#000"></div>
         </div>
       </div>
 
@@ -479,23 +537,22 @@ body.grid-off .gridlayer{display:none}
       <div class="appscreen" id="s-libera">
         <div id="lp-locked" class="block" style="position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;color:#000">
           <div style="transform:translateY(250px)">
-            <p class="kicker" style="opacity:.75;color:#000">Ancora in contumacia</p>
-            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;margin-top:16px;line-height:1.1;color:#000">La tua Libera<br>Pratica ti attende</div>
-            <p style="font-size:16px;font-weight:400;line-height:1.1;opacity:.85;margin-top:16px;color:#000">Completa la soglia minima — un attracco per ciascuna delle quattro macro-aree — per essere ammesso.</p>
+            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000">La tua Libera<br>Pratica ti attende</div>
+            <p style="font-size:16px;font-weight:400;line-height:1.1;opacity:.85;margin-top:16px;color:#000">Completa la soglia minima, un attracco<br>per ciascuna delle quattro macro-aree, per essere ammesso.</p>
           </div>
-          <button class="appbtn" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);margin:0;width:calc(75% - 4px);padding:12px 16px;justify-content:center" onclick="go('sigillo')">Vai al Sigillo <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+          <button class="appbtn" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);margin:0;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Vai al Sigillo <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
         </div>
-        <div id="lp-granted" class="block bordeaux" style="display:none">
+        <div id="lp-granted" class="block bordeaux" style="display:none;position:relative;box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;text-align:center">
           <div class="cert">
             <p class="ct-k">Porto di Ancona · MMXXVIII</p>
-            <svg class="ct-mark" viewBox="0 0 100 100"><g fill="#fff"><rect x="45.6" y="9" width="8.8" height="82"/><rect x="9" y="45.6" width="82" height="8.8"/><rect x="45.6" y="9" width="8.8" height="82" transform="rotate(45 50 50)"/><rect x="45.6" y="9" width="8.8" height="82" transform="rotate(-45 50 50)"/></g></svg>
+            <img class="ct-mark" src="asset/loghi/logo-stella.svg" alt="">
             <div class="ct-title notch">Libera Pratica</div>
             <div class="ct-body">Si concede a <span class="notch">Ospite del Mondo</span> l'ammissione in questa città, cessata la contumacia e visitati mare e parco. Da questo giorno è dichiarato cittadino temporaneo di «Questo Adesso».</div>
-            <p class="ct-date">Rilasciato alla Mole · 14 giugno</p>
+            <p class="ct-date">Rilasciato · 14 giugno</p>
           </div>
-          <div class="imgph" style="height:150px;margin:0 -18px"><svg viewBox="0 0 393 150" preserveAspectRatio="xMidYMid slice"><rect width="393" height="150" fill="#000000" opacity=".92"/><path d="M40 118 L100 118 L100 96 L136 96 L136 118 L360 118 L360 150 L40 150Z" fill="#FFFFFF" opacity=".18"/></svg></div>
-          <div class="pad" style="background:var(--paper);color:var(--ink);margin:0 -18px -22px;padding:22px 18px">
-            <p style="text-align:center;font-size:16px" class="notch">Andara in pace, sei di casa.</p>
+          <div style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);display:flex;gap:8px;width:calc(75% - 4px);margin:0">
+            <button class="appbtn" style="flex:1;justify-content:center;padding:12px;margin:0;font-size:16px" onclick="alert('Download in arrivo!')">Scarica <span class="material-symbols-outlined" style="margin-left:8px;font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24">arrow_downward</span></button>
+            <button class="appbtn" style="flex:1;justify-content:center;padding:12px;margin:0;font-size:16px" onclick="if(navigator.share){navigator.share({title:'Libera Pratica',text:'Ho ottenuto la Libera Pratica ad Ancona!',url:window.location.href})}else{alert('Condivisione non supportata.')}">Condividi <span class="material-symbols-outlined" style="margin-left:8px;font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24">share</span></button>
           </div>
         </div>
       </div>
@@ -507,6 +564,7 @@ body.grid-off .gridlayer{display:none}
       <button class="pf-link" onclick="go('mappa')">Mappa</button>
       <button class="pf-link" onclick="go('biglietti')">Biglietti</button>
       <button class="pf-link" onclick="go('regolamento')">Regolamento</button>
+      <button class="pf-link" onclick="go('profilo')">Profilo</button>
       <div class="pf-legal"><span>Privacy</span><span>© 2028 Libera Pratica — Ancona</span></div>
     </div>
 
@@ -514,6 +572,42 @@ body.grid-off .gridlayer{display:none}
       <div class="areapick-sheet" onclick="event.stopPropagation()">
         <p style="font-size:16px;font-weight:400;line-height:1.1">In quale area hai attraccato?</p>
         <div id="areaPickList"></div>
+      </div>
+    </div>
+
+    <div class="bootscreen" id="bootLoading">
+      <img class="boot-logo" src="asset/loghi/logo-stella.svg" alt="">
+    </div>
+
+    <div class="bootscreen" id="bootRegister" style="display:none">
+      <div class="boot-form">
+        <img src="asset/loghi/logo.svg" alt="Libera Pratica" style="height:54px;width:auto;filter:brightness(0) invert(1);margin-bottom:50px;transform:translateY(-40px)">
+        <div class="h-title" style="color:#fff;line-height:1.4">Sei in arrivo ad Ancona</div>
+        <p style="font-size:16px;font-weight:400;line-height:1.4;opacity:.85;margin-top:0;margin-bottom:52px">Prima di attraccare, qualche dato per l'ammissione.</p>
+        <label class="boot-field">
+          <span>Nome</span>
+          <input type="text" id="regNome" placeholder="Il tuo nome" autocomplete="name">
+        </label>
+        <label class="boot-field">
+          <span>Sesso</span>
+          <select id="regSesso">
+            <option value="">Seleziona</option>
+            <option value="F">Donna</option>
+            <option value="M">Uomo</option>
+            <option value="A">Altro</option>
+            <option value="N">Preferisco non dire</option>
+          </select>
+        </label>
+        <label class="boot-field">
+          <span>Età</span>
+          <input type="number" id="regEta" min="0" max="120" placeholder="La tua età">
+        </label>
+        <label class="boot-field" style="margin-bottom:30px">
+          <span>Nazionalità</span>
+          <select id="regNazionalita"></select>
+        </label>
+        <p id="regError" style="font-size:12px;line-height:1.1;min-height:14px;margin-bottom:8px;color:#FFC7C7"></p>
+        <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="submitRegistration()">Attracca <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
       </div>
     </div>
 
@@ -583,13 +677,21 @@ var ATTI=[
   {t:'Quando ottieni la Libera Pratica',b:'Appena hai un attracco in ognuna delle quattro aree, il sigillo si chiude da solo. La tua Libera Pratica è pronta: scaricala, condividila, portala con te.'}
 ];
 
-var attracchi=[];
-var extraPool={mare:['Arco Clementino'],maestra:['Teatro delle Muse'],parco:['Passetto'],culturale:['Lazzaretto — sale espositive','Mercato delle Erbe']};
+/* persistenza sessione — profilo utente e attracchi restano salvati tra un caricamento e l'altro */
+var LP_USER_KEY='lpUser', LP_ATTRACCHI_KEY='lpAttracchi';
+function loadUser(){ try{return JSON.parse(localStorage.getItem(LP_USER_KEY))}catch(e){return null} }
+function saveUser(u){ try{localStorage.setItem(LP_USER_KEY, JSON.stringify(u))}catch(e){} }
+function loadAttracchi(){ try{var a=JSON.parse(localStorage.getItem(LP_ATTRACCHI_KEY)); return Array.isArray(a)?a:[]}catch(e){return []} }
+function saveAttracchi(){ try{localStorage.setItem(LP_ATTRACCHI_KEY, JSON.stringify(attracchi))}catch(e){} }
+
+var currentUser=loadUser();
+var attracchi=loadAttracchi();
 var currentRouteId=null;
 
 function go(id,param){
   document.querySelectorAll('.appscreen').forEach(function(s){s.classList.remove('on')});
   if(id==='dettaglio'){ currentRouteId=param||currentRouteId||ROUTES[0].id; renderDettaglio(currentRouteId); }
+  if(id==='profilo'){ renderProfilo(); }
   var el=document.getElementById('s-'+id); if(el){el.classList.add('on')}
   var vp=document.getElementById('viewport'); if(vp){vp.scrollTop=0}
   toggleMenu(false);
@@ -638,7 +740,6 @@ function renderDettaglio(id){
   document.getElementById('det-title').textContent=r.title;
   document.getElementById('det-desc').textContent=r.desc;
   var sw=document.getElementById('det-swatch'); sw.style.background=AREAS[r.heroArea].color;
-  document.getElementById('det-swatch-label').textContent=AREAS[r.heroArea].name;
   var chips=document.getElementById('det-chips'); chips.innerHTML='';
   r.aree.forEach(function(a){
     var s=document.createElement('span'); s.className='areachip'; s.style.color=AREAS[a].color;
@@ -674,6 +775,81 @@ function renderRegolamento(){
       '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:40px">'+a.b+'</p>';
     el.appendChild(d);
   });
+}
+
+/* ---- Profilo ---- */
+var SESSO_LABELS={F:'Donna',M:'Uomo',A:'Altro',N:'Preferisco non dire'};
+var NAZIONALITA_LIST=['Italiana','Francese','Tedesca','Spagnola','Portoghese','Britannica','Irlandese',
+  'Svizzera','Austriaca','Belga','Olandese','Greca','Croata','Slovena','Polacca','Ceca','Slovacca',
+  'Ungherese','Rumena','Bulgara','Russa','Ucraina','Turca','Statunitense','Canadese','Messicana',
+  'Brasiliana','Argentina','Cinese','Giapponese','Coreana','Indiana','Australiana','Egiziana','Marocchina','Altra'];
+function nazionalitaOptionsHTML(selected){
+  return '<option value="">Seleziona</option>'+NAZIONALITA_LIST.map(function(n){
+    return '<option value="'+n+'"'+(selected===n?' selected':'')+'>'+n+'</option>';
+  }).join('');
+}
+var PROFILO_FIELDS=[
+  {k:'nome',label:'Nome'},
+  {k:'sesso',label:'Sesso'},
+  {k:'eta',label:'Età'},
+  {k:'nazionalita',label:'Nazionalità'}
+];
+var pencilIcon='<svg width="18" height="18" viewBox="0 0 18 18"><path d="M2.5 15.5l.6-3.2 8-8 2.6 2.6-8 8-3.2.6z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.6 5.8l2.6 2.6" stroke="currentColor" stroke-width="1.4"/></svg>';
+function renderProfilo(){
+  var el=document.getElementById('profilo-dati'); if(!el)return;
+  el.innerHTML='';
+  if(!currentUser)return;
+  PROFILO_FIELDS.forEach(function(f,i){
+    var d=document.createElement('div'); d.id='pf-row-'+f.k;
+    var isLast=i===PROFILO_FIELDS.length-1;
+    d.style.cssText='background:var(--paper);color:var(--ink);border-top:'+(i===0?'none':'1px solid #000')+
+      (isLast?';border-bottom:1px solid #000':'')+';padding:16px 20px';
+    d.innerHTML=profiloRowHTML(f);
+    el.appendChild(d);
+  });
+}
+function profiloRowHTML(f){
+  var v=f.k==='sesso' ? (SESSO_LABELS[currentUser.sesso]||currentUser.sesso) : currentUser[f.k];
+  return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px">'+
+    '<div style="flex:1 1 auto;min-width:0"><p class="kicker">'+f.label+'</p>'+
+    '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:8px">'+v+'</p></div>'+
+    '<button class="pf-edit" onclick="editProfiloField(\''+f.k+'\')" aria-label="Modifica '+f.label+'">'+pencilIcon+'</button></div>';
+}
+function editProfiloField(key){
+  var f=PROFILO_FIELDS.filter(function(x){return x.k===key})[0]; if(!f)return;
+  var row=document.getElementById('pf-row-'+key); if(!row)return;
+  var input;
+  if(key==='sesso'){
+    input='<select id="pf-input-'+key+'" class="pf-input" onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+      Object.keys(SESSO_LABELS).map(function(code){return '<option value="'+code+'"'+(currentUser.sesso===code?' selected':'')+'>'+SESSO_LABELS[code]+'</option>'}).join('')+
+      '</select>';
+  } else if(key==='nazionalita'){
+    input='<select id="pf-input-'+key+'" class="pf-input" onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+      nazionalitaOptionsHTML(currentUser.nazionalita)+'</select>';
+  } else {
+    input='<input id="pf-input-'+key+'" class="pf-input" type="'+(key==='eta'?'number':'text')+'" value="'+(currentUser[key]||'')+'" '+
+      'onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">';
+  }
+  row.innerHTML='<p class="kicker">'+f.label+'</p>'+input;
+  var el=document.getElementById('pf-input-'+key); if(el){ el.focus(); if(el.select) el.select() }
+}
+function saveProfiloField(key){
+  var el=document.getElementById('pf-input-'+key); if(!el)return;
+  currentUser[key]=el.value.trim();
+  saveUser(currentUser);
+  var f=PROFILO_FIELDS.filter(function(x){return x.k===key})[0];
+  var row=document.getElementById('pf-row-'+key); if(row) row.innerHTML=profiloRowHTML(f);
+}
+function logoutProfilo(){
+  try{ localStorage.removeItem(LP_USER_KEY) }catch(e){}
+  currentUser=null;
+  ['regNome','regEta','regNazionalita'].forEach(function(id){ var f=document.getElementById(id); if(f) f.value='' });
+  var sesso=document.getElementById('regSesso'); if(sesso) sesso.value='';
+  var err=document.getElementById('regError'); if(err) err.textContent='';
+  document.querySelectorAll('.appscreen').forEach(function(s){s.classList.remove('on')});
+  toggleMenu(false);
+  document.getElementById('viewport').classList.add('boot-active');
+  document.getElementById('bootRegister').style.display='flex';
 }
 
 /* ---- Mappa ---- */
@@ -724,6 +900,7 @@ var PINS=[
   {area:'culturale', name:'Stadio Dorico', note:'Futuro hub cultura sportiva', lng:13.5299, lat:43.6169}
 ];
 var mapPinEls=[];
+var mapPinPopup=null;
 function addMapPins(){
   mapPinEls=[];
   PINS.forEach(function(p){
@@ -733,7 +910,7 @@ function addMapPins(){
     dot.className='dot';
     dot.style.background=AREAS[p.area].hex;
     el.appendChild(dot);
-    el.onclick=function(){ showPin(p.area, p.name, p.note, el) };
+    el.onclick=function(ev){ ev.stopPropagation(); showPin(p.area, p.name, p.note, el, [p.lng, p.lat]) };
     new maplibregl.Marker({element:el}).setLngLat([p.lng, p.lat]).addTo(osmMap);
     mapPinEls.push({area:p.area, el:el});
   });
@@ -758,6 +935,8 @@ function initOsmMap(){
 /* mappa del dettaglio percorso: un pin per ogni tappa, con vista inquadrata su tutte */
 var detMap=null;
 var detMapMarkers=[];
+var detMapLoaded=false;
+var detMapPendingRoute=null;
 function initDetMap(){
   if(detMap || typeof maplibregl==='undefined') return;
   var el=document.getElementById('det-map'); if(!el) return;
@@ -768,6 +947,21 @@ function initDetMap(){
     zoom:13
   });
   detMap.addControl(new maplibregl.NavigationControl(), 'top-right');
+  detMap.on('load', function(){
+    detMap.addSource('route-line', {type:'geojson', data:{type:'Feature', geometry:{type:'LineString', coordinates:[]}}});
+    detMap.addLayer({
+      id:'route-line-layer', type:'line', source:'route-line',
+      layout:{'line-join':'round','line-cap':'round'},
+      paint:{'line-color':'#1d1d1b','line-width':2.5,'line-dasharray':[1,2],'line-opacity':.7}
+    });
+    detMapLoaded=true;
+    if(detMapPendingRoute){ drawDetMapLine(detMapPendingRoute); detMapPendingRoute=null; }
+  });
+}
+/* linea retta tra le tappe, in ordine — non è un percorso stradale reale, solo un collegamento visivo */
+function drawDetMapLine(route){
+  var coords=route.tappe.filter(function(t){return t.lng!=null && t.lat!=null}).map(function(t){return [t.lng, t.lat]});
+  detMap.getSource('route-line').setData({type:'Feature', geometry:{type:'LineString', coordinates:coords}});
 }
 function renderDetMapPins(route){
   if(!detMap) return;
@@ -786,6 +980,7 @@ function renderDetMapPins(route){
     bounds.extend([t.lng, t.lat]);
   });
   if(!bounds.isEmpty()) detMap.fitBounds(bounds, {padding:40, maxZoom:16});
+  if(detMapLoaded){ drawDetMapLine(route) } else { detMapPendingRoute=route }
 }
 var AREA_ICON_SVG={
   mare:'<rect class="aic" x="21.6" y="3.91" width="98.54" height="13.58"/><rect class="aic" x="21.6" y="31.81" width="98.54" height="15.04"/><rect class="aic" x="15.66" y="121.92" width="29.82" height="15.9"/><rect class="aic" x="96.25" y="121.92" width="29.82" height="15.9"/><polyline class="aic" points="5.84 137.82 9.72 137.82 15.66 137.82"/><polyline class="aic" points="135.89 137.82 132.01 137.82 126.07 137.82"/><polyline class="aic" points="96.25 137.82 87 137.82 54.73 137.82 45.48 137.82"/><line class="aic" x1="40.51" y1="121.92" x2="40.51" y2="46.85"/><line class="aic" x1="21.6" y1="121.92" x2="21.6" y2="46.85"/><line class="aic" x1="120.14" y1="121.92" x2="120.14" y2="46.85"/><polygon class="aic" points="132.01 17.5 126.07 24.66 120.14 31.81 21.6 31.81 21.6 31.55 15.66 24.52 9.72 17.5 132.01 17.5"/><line class="aic" x1="21.7" y1="31.67" x2="21.6" y2="31.55"/><line class="aic" x1="101.22" y1="121.92" x2="101.22" y2="46.85"/><path class="aic" d="M66.71,58.9h8.3c6.62,0,11.99,5.37,11.99,11.99v66.93h-32.28v-66.93c0-6.62,5.37-11.99,11.99-11.99Z"/>',
@@ -805,28 +1000,45 @@ function renderMappaCards(){
   });
   setupAreaCardObserver();
 }
-var areaCardObserver=null;
+/* individua il rettangolo più vicino alla posizione di scroll attuale (quello su cui lo
+   scroll-snap si è agganciato) e mostra solo i pin della sua area — niente soglie di
+   intersezione da indovinare, quindi niente sfarfallio tra due rettangoli durante lo scroll */
+var areaCardScrollHandler=null, areaCardScrollRaf=null;
 function setupAreaCardObserver(){
   var container=document.getElementById('mappa-cards');
   if(!container) return;
-  if(areaCardObserver) areaCardObserver.disconnect();
-  areaCardObserver=new IntersectionObserver(function(entries){
-    entries.forEach(function(entry){
-      if(entry.isIntersecting && entry.intersectionRatio>=0.6) filterPinsByArea(entry.target.dataset.area);
+  if(areaCardScrollHandler) container.removeEventListener('scroll', areaCardScrollHandler);
+  function updateActiveCard(){
+    var cards=container.querySelectorAll('.areacard');
+    var mid=container.scrollLeft + container.clientWidth/2, closest=null, min=Infinity;
+    cards.forEach(function(c){
+      var center=c.offsetLeft + c.offsetWidth/2;
+      var d=Math.abs(center-mid);
+      if(d<min){ min=d; closest=c; }
     });
-  }, {root:container, threshold:0.6});
-  container.querySelectorAll('.areacard').forEach(function(card){ areaCardObserver.observe(card) });
+    if(closest) filterPinsByArea(closest.dataset.area);
+  }
+  areaCardScrollHandler=function(){
+    if(areaCardScrollRaf) cancelAnimationFrame(areaCardScrollRaf);
+    areaCardScrollRaf=requestAnimationFrame(updateActiveCard);
+  };
+  container.addEventListener('scroll', areaCardScrollHandler, {passive:true});
+  updateActiveCard();
 }
 function scrollToAreaCard(idx){
   var el=document.getElementById('mappa-cards');
   var card=el.children[idx];
   if(card) card.scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
 }
-function showPin(area,name,note,el){
-  var card=document.getElementById('pincard');
-  document.getElementById('pin-name').textContent=name;
-  document.getElementById('pin-note').textContent=note||'';
-  card.style.display='flex'; card.style.background=AREAS[area].hex;
+function showPin(area,name,note,el,lngLat){
+  if(mapPinPopup) mapPinPopup.remove();
+  var html='<div class="map-pin-label" style="background:'+AREAS[area].hex+'">'+
+    '<div class="pl-name">'+name+'</div>'+
+    (note?'<div class="pl-note">'+note+'</div>':'')+'</div>';
+  mapPinPopup=new maplibregl.Popup({closeButton:false, closeOnClick:false, offset:14, maxWidth:'240px'})
+    .setLngLat(lngLat).setHTML(html).addTo(osmMap);
+  var tip=mapPinPopup.getElement().querySelector('.maplibregl-popup-tip');
+  if(tip){ ['borderTopColor','borderBottomColor','borderLeftColor','borderRightColor'].forEach(function(k){ tip.style[k]=AREAS[area].hex }) }
   document.querySelectorAll('.map-pin').forEach(function(c){c.classList.remove('on')});
   el.classList.add('on');
 }
@@ -850,6 +1062,7 @@ var STAMP_SRC={
 };
 function addAttracco(name,area){
   attracchi.push({name:name,area:area,time:'ora'});
+  saveAttracchi();
   renderAttracchi(); updateSigillo(); showStamp(area);
 }
 function showStamp(area){
@@ -913,9 +1126,9 @@ function updateSigillo(){
   var granted=document.getElementById('lp-granted'), locked=document.getElementById('lp-locked');
   if(n>=4){
     btn.innerHTML='✓ Ammissione completata'; btn.disabled=true; btn.style.opacity='.5'; btn.style.cursor='default';
-    granted.style.display='block'; locked.style.display='none';
+    granted.style.display='flex'; locked.style.display='none'; granted.setAttribute('data-visible','1');
   } else {
-    granted.style.display='none'; locked.style.display='block';
+    granted.style.display='none'; locked.style.display='block'; granted.removeAttribute('data-visible');
   }
 }
 function registerAttracco(){
@@ -929,27 +1142,74 @@ function registerAttracco(){
     b.onclick=function(){ pickArea(k) };
     list.appendChild(b);
   });
+  positionAreaPickOverlay();
   document.getElementById('areaPickOverlay').classList.add('show');
 }
+/* ancora l'overlay esattamente al riquadro dell'app (non alla finestra del browser),
+   calcolandone le coordinate reali via JS invece di affidarsi al containing block CSS */
+function positionAreaPickOverlay(){
+  var vp=document.getElementById('viewport'); var ov=document.getElementById('areaPickOverlay');
+  if(!vp || !ov) return;
+  var r=vp.getBoundingClientRect();
+  ov.style.left=r.left+'px'; ov.style.top=r.top+'px';
+  ov.style.width=r.width+'px'; ov.style.height=r.height+'px';
+}
+window.addEventListener('resize', function(){
+  if(document.getElementById('areaPickOverlay').classList.contains('show')) positionAreaPickOverlay();
+});
 function closeAreaPick(){
   document.getElementById('areaPickOverlay').classList.remove('show');
 }
 function pickArea(area){
-  var pool=extraPool[area]||['Nuova tappa'];
-  var name=pool.shift()||'Nuova tappa';
-  addAttracco(name,area);
+  addAttracco(AREAS[area].name,area);
   closeAreaPick();
 }
 
+/* boot — caricamento seguito, se serve, dalla registrazione; poi si entra sempre in Libera Pratica */
+function submitRegistration(){
+  var nome=document.getElementById('regNome').value.trim();
+  var sesso=document.getElementById('regSesso').value;
+  var eta=document.getElementById('regEta').value;
+  var naz=document.getElementById('regNazionalita').value.trim();
+  var err=document.getElementById('regError');
+  if(!nome||!sesso||!eta||!naz){ err.textContent='Compila tutti i campi per continuare.'; return; }
+  currentUser={nome:nome,sesso:sesso,eta:eta,nazionalita:naz};
+  saveUser(currentUser);
+  attracchi=[];
+  saveAttracchi();
+  renderAttracchi();
+  updateSigillo();
+  document.getElementById('bootRegister').style.display='none';
+  document.getElementById('viewport').classList.remove('boot-active');
+  go('home');
+}
+function startBoot(){
+  if(currentUser){
+    /* sessione già registrata: niente animazione né cambio schermata, resta dove si era (hash già ripristinato da syncFromHash) */
+    document.getElementById('bootLoading').style.display='none';
+    document.getElementById('viewport').classList.remove('boot-active');
+    return;
+  }
+  setTimeout(function(){
+    document.getElementById('bootLoading').style.display='none';
+    document.getElementById('bootRegister').style.display='flex';
+  }, 1400);
+}
+
 /* ---- init ---- */
+document.getElementById('regNazionalita').innerHTML=nazionalitaOptionsHTML('');
 renderRegolamento(); renderPercorsiList(); renderMappaCards(); renderTickets(); renderAttracchi();
 renderDettaglio(ROUTES[0].id); updateSigillo();
 syncFromHash();
+startBoot();
 
 function sizeLpLocked(){
-  var vp=document.getElementById('viewport'), nav=document.getElementById('appheader'), lp=document.getElementById('lp-locked');
-  if(!vp||!nav||!lp)return;
-  lp.style.minHeight=(vp.clientHeight-nav.offsetHeight)+'px';
+  var vp=document.getElementById('viewport'), nav=document.getElementById('appheader'),
+    lp=document.getElementById('lp-locked'), lg=document.getElementById('lp-granted');
+  if(!vp||!nav)return;
+  var h=(vp.clientHeight-nav.offsetHeight)+'px';
+  if(lp) lp.style.minHeight=h;
+  if(lg) lg.style.minHeight=h;
 }
 sizeLpLocked();
 window.addEventListener('resize', sizeLpLocked);
