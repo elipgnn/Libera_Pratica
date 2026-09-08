@@ -2,6 +2,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Libera Pratica</title>
+<link rel="icon" type="image/jpeg" href="asset/icona-app.jpg">
+<link rel="apple-touch-icon" href="asset/icona-app.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -66,7 +68,7 @@ button{font-family:var(--disp)}
    Le linee sono allineate al margine destro (20px dal bordo), non più centrate nell'hotspot. */
 .burger{background-color:transparent;position:absolute;top:0;right:0;height:100%;width:64px;border:none;
   display:flex;flex-direction:column;justify-content:center;align-items:flex-end;cursor:pointer;transition:opacity .3s}
-.burger:hover{opacity:.5}
+.burger:hover{}
 .burger::before{content:"";height:2px;width:30px;background-color:#fff;position:absolute;top:50%;right:20px;
   transform:translateY(-50%);transition:opacity .5s cubic-bezier(.87,0,.13,1)}
 .burger>span{width:30px;height:2px;position:absolute;top:50%;right:20px;transform:translateY(-50%)}
@@ -96,14 +98,14 @@ button{font-family:var(--disp)}
 .appscreen{display:none}
 .appscreen.on{display:block}
 .pad{padding:20px 20px 32px}
-.kicker{font-size:12px;font-weight:400;line-height:1.1;opacity:.65}
+.kicker{font-size:12px;font-weight:400;line-height:1.1;}
 .h-title{font-weight:400;letter-spacing:-.025em;line-height:1.1;font-size:28px}
 #det-title{font-size:22px}
 .h-hero{font-weight:400;font-size:30px;letter-spacing:-.02em;line-height:1.1}
 .h-big{font-weight:700;font-size:44px;letter-spacing:-.03em;line-height:.95}
 
 .appbtn{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--ink);
-  color:var(--paper);border:none;cursor:pointer;font-weight:600;font-size:18px;padding:16px 20px;letter-spacing:-.01em}
+  color:var(--paper);border:none;cursor:pointer;font-weight:400;font-size:18px;padding:16px 20px;letter-spacing:-.01em}
 .appbtn.verde{background:var(--verde);color:#fff}
 .appbtn.bordeaux{background:var(--bordeaux);color:#fff}
 
@@ -134,19 +136,21 @@ button{font-family:var(--disp)}
 .block.bordeaux{background:var(--bordeaux);color:#fff}
 .block.ink{background:var(--ink);color:var(--paper)}
 
-.imgph{position:relative;background:var(--ink);overflow:hidden;flex:0 0 auto}
-.imgph svg{display:block;width:100%;height:100%}
-.duo{display:flex}
-.duo .imgph{flex:1 1 auto;min-width:0}
-.duo .swatch{width:auto;flex:0 0 calc(33.333% - 9.333px)}
+.imgph{position:relative;background:transparent;overflow:hidden;flex:0 0 auto}
+.imgph svg, .imgph img{display:block;width:100%;height:100%;margin:0;padding:0;border:none!important;outline:none!important;box-shadow:none!important}
+.imgph video{display:block;width:100%;height:100%;margin:0;padding:0;border:none!important;outline:none!important;box-shadow:none!important;transform:scale(1.05);transform-origin:center;object-fit:cover}
+.duo{display:flex;border:none!important}
+.duo .imgph{flex:1 1 auto;min-width:0;border:none!important}
+.duo .swatch{width:auto;flex:0 0 calc(33.333% - 9.333px);border:none!important}
 
 .areachip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
   text-transform:uppercase;letter-spacing:.06em;border:2px solid currentColor;padding:8px 13px;margin:0 8px 8px 0}
 
 .routerow{display:block;width:100%;text-align:left;background:var(--ink);color:var(--paper);border:none;
   border-bottom:1px solid #fff;cursor:pointer;padding:16px 20px;font-family:var(--disp)}
+.routerow:last-child{border-bottom:none}
 .routerow .rr-t{font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;margin:0}
-.routerow .rr-s{margin:0;font-size:16px;font-weight:400;opacity:.85;margin-top:24px;line-height:1.1;max-width:320px}
+.routerow .rr-s{margin:0;font-size:16px;font-weight:400;margin-top:24px;line-height:1.1;max-width:320px}
 .routerow .rr-row{display:flex;align-items:center;justify-content:space-between;margin-top:40px}
 .routerow .rr-meta{position:relative;width:100%;font-size:16px;font-weight:400;line-height:1.1}
 .routerow .rr-meta span{display:inline-flex;align-items:center;gap:8px}
@@ -171,7 +175,7 @@ button{font-family:var(--disp)}
 
 .attraccorow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;color:#fff;min-height:88px}
 .attraccorow .ar-t{font-weight:400;font-size:22px;line-height:1.1}
-.attraccorow .ar-m{font-size:12px;font-weight:400;line-height:1.1;opacity:.85;margin-top:4px}
+.attraccorow .ar-m{font-size:12px;font-weight:400;line-height:1.1;margin-top:6px}
 .attraccorow .ar-icon{width:40px;height:40px;flex:0 0 auto}
 .attraccorow .ar-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
 
@@ -185,7 +189,7 @@ button{font-family:var(--disp)}
 .ticket-row.a{background:var(--bordeaux);color:#fff}
 .ticket-row.b{background:var(--paper);color:var(--ink)}
 .ticket-row .tk-t{font-weight:400;font-size:22px;line-height:1.1}
-.ticket-row .tk-s{font-size:12px;font-weight:400;opacity:.85;margin-top:8px;line-height:1.1;max-width:calc(66.667% - 4.667px)}
+.ticket-row .tk-s{font-size:12px;font-weight:400;margin-top:8px;line-height:1.1;max-width:calc(66.667% - 4.667px)}
 .ticket-row .tk-p{font-weight:400;font-size:22px;line-height:1;white-space:nowrap}
 
 .sponsorbar{overflow:hidden;padding:20px 0}
@@ -213,7 +217,7 @@ button{font-family:var(--disp)}
 .maplibregl-popup-tip{display:none}
 .map-pin-label{padding:10px 14px;color:#fff;font-family:var(--disp);max-width:220px}
 .map-pin-label .pl-name{font-size:14px;font-weight:400;line-height:1.1}
-.map-pin-label .pl-note{font-size:11px;font-weight:400;line-height:1.2;opacity:.8;margin-top:4px}
+.map-pin-label .pl-note{font-size:11px;font-weight:400;line-height:1.2;margin-top:4px}
 
 .areacards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .areacards::-webkit-scrollbar{height:0}
@@ -225,11 +229,11 @@ button{font-family:var(--disp)}
 .areacard .ac-icon{width:60px;height:60px;flex:0 0 auto}
 .areacard .ac-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
 .areacard .ac-nums{font-family:var(--mono);font-size:24px;line-height:1.1;letter-spacing:.05em;white-space:nowrap}
-.areacard .ac-nums span{opacity:.4;cursor:pointer}
+.areacard .ac-nums span{cursor:pointer}
 .areacard .ac-nums span.on{opacity:1}
 .areacard .ac-nums span.on{opacity:1}
 
-.stamp-slot{position:relative;height:452px;margin:0 20px}
+.stamp-slot{position:relative;height:422px;margin:0 20px}
 .stamp-slot img{position:absolute;width:136px;height:136px;opacity:0;cursor:grab;touch-action:none;
   transform:scale(.6) rotate(var(--rot,0deg));transition:opacity .35s ease,transform .35s ease}
 .stamp-slot img.show{opacity:1;transform:scale(1) rotate(var(--rot,0deg))}
@@ -254,7 +258,7 @@ button{font-family:var(--disp)}
 .boot-logo{width:96px;height:auto;filter:brightness(0) invert(1)}
 .boot-form{width:100%;max-width:320px}
 .boot-field{display:block;width:100%;text-align:left;margin-bottom:24px}
-.boot-field span{display:block;font-size:12px;font-weight:400;opacity:.65;margin-bottom:8px;line-height:1.1}
+.boot-field span{display:block;font-size:12px;font-weight:400;margin-bottom:8px;line-height:1.1}
 .boot-field input,.boot-field select{width:100%;background:transparent;border:none;
   border-bottom:1.5px solid rgba(255,255,255,.5);color:#fff;font-family:var(--disp);font-size:16px;
   padding:8px 0;box-sizing:border-box;-webkit-appearance:none;appearance:none;border-radius:0}
@@ -263,7 +267,7 @@ button{font-family:var(--disp)}
 .boot-field input:focus,.boot-field select:focus{outline:none;border-bottom-color:#fff}
 
 /* profilo — righe dati con matita per la modifica inline */
-.pf-edit{background:none;border:none;color:var(--ink);opacity:.55;cursor:pointer;padding:8px;
+.pf-edit{background:none;border:none;color:var(--ink);cursor:pointer;padding:8px;
   flex:0 0 auto;display:flex;align-items:center;justify-content:center}
 .pf-edit:hover{opacity:1}
 .pf-input{width:100%;background:transparent;border:none;border-bottom:1.5px solid var(--ink);color:var(--ink);
@@ -276,7 +280,7 @@ button{font-family:var(--disp)}
 .cert .ct-k{position:absolute;top:20px;left:0;right:0;font-size:12pt;font-weight:400;line-height:1.1;opacity:1}
 .cert .ct-title{font-size:28px;margin:16px 0 16px}
 .cert .ct-body{font-size:16px;font-weight:400;line-height:1.1;max-width:300px;margin:0 auto}
-.cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;opacity:.7;margin-top:30px}
+.cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;margin-top:30px}
 /* footer di navigazione — in fondo alla pagina, non fissa, come su un sito */
 .pagefooter{background:#fff;color:#000}
 #s-dettaglio.on ~ .pagefooter{border-top:1px solid #000}
@@ -286,7 +290,7 @@ button{font-family:var(--disp)}
   font-family:var(--disp);font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;padding:16px 20px;
   border-bottom:1px solid #000}
 .pf-legal{display:flex;align-items:center;justify-content:space-between;padding:40px 20px 20px;
-  font-size:12px;font-weight:400;line-height:1.1;opacity:.75;gap:16px}
+  font-size:12px;font-weight:400;line-height:1.1;gap:16px}
 
 /* --- griglia di riferimento temporanea: colonne 6/16/20, righe 8/16 — da rimuovere a verifica ultimata --- */
 .gridlayer{position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:430px;transform:translateX(-50%);z-index:9999;pointer-events:none}
@@ -327,7 +331,7 @@ body.grid-off .gridlayer{display:none}
       <!-- HOME -->
       <div class="appscreen on" id="s-home">
         <div class="pad" style="padding-bottom:20px">
-          <p class="h-hero"><span class="notch">Sabir</span>, cittadino del mondo. <span class="notch">Bono viaggio</span> — sei attraccato nel porto di Ancona.</p>
+          <p class="h-hero"><span class="notch">Sabir</span>, cittadino de questo mare. <span class="notch">Bono viaggio</span> — sei giunto al porto di Ancona.</p>
         </div>
         <div class="duo" style="height:152px;margin-top:96px">
           <div class="imgph"><video src="asset/video/video_ancona_6_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
@@ -336,7 +340,7 @@ body.grid-off .gridlayer{display:none}
         <div class="introbar" id="introBar">
           <div class="introhead">
             <button class="introbtn" onclick="toggleIntro()">
-              <span class="introlabel"><span style="display:block;font-size:22px;font-weight:400;line-height:1.1;text-align:left">Per iniziare ascolta</span><span style="display:block;font-size:22px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left">la storia del Lazzaretto</span></span>
+              <span class="introlabel"><span style="display:block;font-size:18px;font-weight:400;line-height:1.1;text-align:left">Per iniziare ascolta</span><span style="display:block;font-size:18px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left">la storia del Lazzaretto</span></span>
               <span class="introicon"></span>
             </button>
           </div>
@@ -351,12 +355,12 @@ body.grid-off .gridlayer{display:none}
         </div>
         <div class="pad" style="position:relative;padding-top:20px">
           <p style="font-size:28px;font-weight:400;line-height:1.1;color:var(--ink)">Il tuo sigillo</p>
-          <p style="font-size:16px;margin-top:56px;line-height:1.1">Ricorda, cittadino del mondo: per essere ammesso ad Ancona dovrai completare tutte le tappe della tua <span class="notch">contumacia</span>.</p>
+          <p style="font-size:16px;margin-top:56px;line-height:1.1">Ricorda: per otenner la Libera Pratica ad Ancona dovrai far la tua <span class="notch">contumacia</span>. Mira i luoghi e prendi i sigilli.</p>
           <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Continua l'ammissione <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
         </div>
         <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
           <p style="color:#fff;font-size:28px;font-weight:400;line-height:1.1">Percorsi vicino a te</p>
-          <p style="color:#fff;font-size:16px;line-height:1.1;margin-top:136px">Ricorda, cittadino del mondo: le rotte più vicine a te iniziano a un passo.</p>
+          <p style="color:#fff;font-size:16px;line-height:1.1;margin-top:136px">Andara per le vie: le rotte più vicine a te iniziano a un passo.</p>
         </div>
         <div class="percblock" style="--total-items:3">
           <button class="percbar" style="--item-position:1" onclick="go('dettaglio','contumacia')">
@@ -402,7 +406,7 @@ body.grid-off .gridlayer{display:none}
       <div class="appscreen" id="s-regolamento">
         <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
           <h2 class="h-title" style="color:#fff">Il Regolamento</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;opacity:.9;line-height:1.1">Per essere ammesso, basta attraversare la città — non correrla tutta. Quattro luoghi, quattro anime di Ancona. Il resto è libertà.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Per l'ammissione, basta caminar la città — non correrla. Quattro luoghi, quattro anime. Il resto è andar libero.</p>
         </div>
         <div id="regolamento-atti"></div>
         <div class="ticker">
@@ -417,9 +421,9 @@ body.grid-off .gridlayer{display:none}
 
       <!-- PROFILO -->
       <div class="appscreen" id="s-profilo">
-        <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
+        <div class="block bordeaux" style="padding-bottom:14px;padding-top:20px">
           <h2 class="h-title" style="color:#fff">Il tuo profilo</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;opacity:.9;line-height:1.1;width:100%">Questi sono i dati che ci hai lasciato in ammissione: la tua identità di cittadino temporaneo.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Questi i dati lasciati all'approdo: la tua identità temporanea. Sei pronto per andar nella città.</p>
         </div>
         <div class="duo" style="height:177px">
           <div class="imgph"><video src="asset/video/video_ancona_1_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
@@ -442,14 +446,11 @@ body.grid-off .gridlayer{display:none}
       <!-- PERCORSI (lista) -->
       <div class="appscreen" id="s-percorsi">
         <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Percorsi</h2>
-          <p style="font-size:16px;font-weight:400;opacity:.85;margin-top:160px;line-height:1.1">Poche rotte, scelte con cura. Ognuna passa dal mare e dal parco.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Poche rotte, scelte bene. Ognuna andara per mare e per parco.</p>
         </div>
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px">
-          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;opacity:.9;text-align:right">Percorsi possibili</span>
+          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;text-align:right">Percorsi possibili</span>
           <span class="h-big" style="display:block;font-weight:400;line-height:.85;font-size:50px;margin-top:8px;text-align:right">12</span>
-          <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:112px;font-size:12px;font-weight:400;line-height:1.1">
-            <span>2 rotte fatte</span><span>1 lasciata a metà</span><span>10 da completare</span>
-          </div>
         </div>
         <div id="percorsi-list"></div>
         <div class="duo">
@@ -461,14 +462,14 @@ body.grid-off .gridlayer{display:none}
       <!-- DETTAGLIO PERCORSO (dinamico) -->
       <div class="appscreen" id="s-dettaglio">
         <div class="duo" style="height:177px">
-          <div class="imgph"><video src="asset/video/video_ancona_4_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="imgph"><video src="asset/video/video_ancona_5_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
           <div class="swatch imgph" id="det-swatch" style="display:flex;align-items:center;justify-content:center">
           </div>
         </div>
         <div class="pad" style="padding-bottom:8px;padding-top:20px">
           <div id="det-chips"></div>
           <h2 class="h-title" id="det-title" style="margin-top:16px"></h2>
-          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:56px;line-height:1.1" id="det-desc"></p>
+          <p style="font-size:16px;font-weight:400;margin-top:56px;line-height:1.1" id="det-desc"></p>
         </div>
         <div class="mapbox" id="det-map" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
         <div id="det-meta" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:#fff;font-size:16px;font-weight:400;line-height:1.1"></div>
@@ -482,13 +483,13 @@ body.grid-off .gridlayer{display:none}
       <!-- MAPPA -->
       <div class="appscreen" id="s-mappa">
         <div class="duo" style="height:177px">
-          <div class="imgph"><img src="asset/img/ancona_1.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="imgph"><img src="asset/img/ancona_3.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
           <div class="swatch imgph" style="background:var(--bordeaux)"></div>
         </div>
         <div class="pad" style="padding-bottom:8px;padding-top:20px"><h2 class="h-title">Mappa</h2>
-          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:56px;line-height:1.1">I punti d'attracco per le quattro macro-aree di «Questo Adesso». Mira — guarda dove puoi scendere a terra.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:56px;line-height:1.1">Gli attracchi per le quattro aree. Mira la mappa, scegli dove scender a terra.</p>
         </div>
-        <div class="mapbox" id="osmMap" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
+        <div class="mapbox" id="osmMap" style="width:100%;aspect-ratio:4/3;margin-top:16px;background:#C7C7C0"></div>
         <div class="areacards" id="mappa-cards"></div>
       </div>
 
@@ -498,12 +499,12 @@ body.grid-off .gridlayer{display:none}
         <div class="stamp-slot" id="stampSlot"></div>
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px;margin-top:8px">
           <p style="font-size:28px;font-weight:400;line-height:1.1;color:#fff">Attracchi registrati</p>
-          <p style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px">Se non appare automaticamente registra manualmente il tuo attracco inserendo poche e semplici informazioni</p>
+          <p style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px">Se lo sigillo non appare da solo, registra il tuo attracco a mano qui sotto.</p>
           <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" id="stampBtn" onclick="registerAttracco()">Registra attracco <span class="material-symbols-outlined" style="margin-left:10px">add</span></button>
         </div>
         <div id="attracchi"></div>
         <div class="duo" style="height:177px">
-          <div class="imgph"><video src="asset/video/video_ancona_3_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="imgph"><video src="asset/video/video_ancona_4_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
           <div class="swatch imgph" style="background:#000"></div>
         </div>
       </div>
@@ -511,10 +512,10 @@ body.grid-off .gridlayer{display:none}
       <!-- BIGLIETTI -->
       <div class="appscreen" id="s-biglietti">
         <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Biglietteria</h2>
-          <p style="font-size:16px;font-weight:400;opacity:.8;margin-top:160px;line-height:1.1">Un solo portale. Pacchetti cumulativi per percorso — eventi, luoghi, spostamenti. La Libera Pratica non è mai in vendita.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Un solo varco. Pacchetti per andar per eventi e luoghi. La Libera Pratica non si vende mai.</p>
         </div>
         <div class="duo" style="height:177px">
-          <div class="imgph"><img src="asset/img/ancona_6.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="imgph"><img src="asset/img/ancona_1.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
           <div class="swatch imgph" style="background:var(--bordeaux)"></div>
         </div>
         <div class="sponsorbar">
@@ -550,7 +551,7 @@ body.grid-off .gridlayer{display:none}
         <div id="lp-locked" class="block" style="position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;color:#000">
           <div style="transform:translateY(250px)">
             <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000">La tua Libera<br>Pratica ti attende</div>
-            <p style="font-size:16px;font-weight:400;line-height:1.1;opacity:.85;margin-top:16px;color:#000">Completa la soglia minima, un attracco<br>per ciascuna delle quattro macro-aree, per essere ammesso.</p>
+            <p style="font-size:16px;font-weight:400;line-height:1.1;margin-top:16px;color:#000">Faz un attracco per ognuna delle quattro<br>aree per compir la tua ammissione.</p>
           </div>
           <button class="appbtn" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);margin:0;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Vai al Sigillo <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
         </div>
@@ -595,7 +596,7 @@ body.grid-off .gridlayer{display:none}
       <div class="boot-form">
         <img src="asset/loghi/logo.svg" alt="Libera Pratica" style="height:54px;width:auto;filter:brightness(0) invert(1);margin-bottom:50px;transform:translateY(-40px)">
         <div class="h-title" style="color:#fff;line-height:1.4">Sei in arrivo ad Ancona</div>
-        <p style="font-size:16px;font-weight:400;line-height:1.4;opacity:.85;margin-top:0;margin-bottom:52px">Prima di attraccare, qualche dato per l'ammissione.</p>
+        <p style="font-size:16px;font-weight:400;line-height:1.4;margin-top:0;margin-bottom:52px">Prima di scender a terra, serve qualche dato per l'ammissione.</p>
         <label class="boot-field">
           <span>Nome</span>
           <input type="text" id="regNome" placeholder="Il tuo nome" autocomplete="name">
@@ -625,11 +626,7 @@ body.grid-off .gridlayer{display:none}
 
     </div><!-- /viewport -->
 
-<div class="gridlayer" id="gridlayer">
-  <div class="cols"><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="rows"></div>
-</div>
-<button class="gridtoggle" onclick="document.body.classList.toggle('grid-off')">Griglia on/off</button>
+
 
 <script>
 var AREAS={
@@ -682,11 +679,9 @@ var MAPPA_CARDS=[
 ];
 
 var ATTI=[
-  {t:'Visita un luogo per ognuna delle quattro aree',b:'Ancona è divisa in quattro macro-aree: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per ottenere la Libera Pratica ti basta un attracco in ciascuna — non servono quattro tappe nella stessa zona.'},
-  {t:'Come si registra un attracco',b:"Arriva al luogo. L'app lo riconosce da sola quando sei vicino, oppure inquadra il QR che trovi sul posto. Fatto: quel luogo è tuo."},
-  {t:'I percorsi ti aiutano, non ti obbligano',b:'Se non sai da dove iniziare, segui uno dei tre percorsi curati: ti accompagnano tra le tappe con un racconto e una guida. Ma puoi anche scegliere da solo, luogo per luogo, seguendo solo la tua curiosità.'},
-  {t:'Non serve completare un percorso intero',b:"Puoi prendere una tappa da un percorso e una da un altro. L'unica regola è coprire le quattro aree, in qualunque ordine, con qualunque combinazione."},
-  {t:'Quando ottieni la Libera Pratica',b:'Appena hai un attracco in ognuna delle quattro aree, il sigillo si chiude da solo. La tua Libera Pratica è pronta: scaricala, condividila, portala con te.'}
+  {t:'Un attracco per ogni porto',b:'Ancona è divisa in quattro anime: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per la tua Libera Pratica faz un attracco in ciascuna.'},
+  {t:'Come prender lo sigillo',b:"Andara sul luogo. L'app ti riconosce, oppure mira il QR sul posto. Fatto: lo sigillo è tuo."},
+  {t:'La tua Libera Pratica',b:'Con un attracco in ogni area, lo cerchio si chiude. La Libera Pratica è pronta: scarica, mostra, andara dove vuoi.'}
 ];
 
 /* persistenza sessione — profilo utente e attracchi restano salvati tra un caricamento e l'altro */
@@ -1073,7 +1068,10 @@ var STAMP_SRC={
   culturale:'asset/icone/icone-marecultura-timbro.svg'
 };
 function addAttracco(name,area){
-  attracchi.push({name:name,area:area,time:'ora'});
+  var h = Math.floor(Math.random()*12)+8;
+  var m = Math.floor(Math.random()*60);
+  var timeStr = (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
+  attracchi.push({name:name,area:area,time:timeStr});
   saveAttracchi();
   renderAttracchi(); updateSigillo(); showStamp(area);
 }
@@ -1123,7 +1121,7 @@ function renderAttracchi(){
   var el=document.getElementById('attracchi'); el.innerHTML='';
   attracchi.forEach(function(a){
     var d=document.createElement('div'); d.className='attraccorow'; d.style.background=AREAS[a.area].color;
-    d.innerHTML='<div><div class="ar-t">'+a.name+'</div><div class="ar-m"><span style="text-transform:uppercase">Attracco</span> · '+a.time+'</div></div>'+
+    d.innerHTML='<div><div class="ar-t">'+a.name+'</div><div class="ar-m"><span>Attracco</span> · '+a.time+'</div></div>'+
       '<svg class="ar-icon" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[a.area]+'</svg>';
     el.appendChild(d);
   });
@@ -1137,7 +1135,7 @@ function updateSigillo(){
   var btn=document.getElementById('stampBtn');
   var granted=document.getElementById('lp-granted'), locked=document.getElementById('lp-locked');
   if(n>=4){
-    btn.innerHTML='✓ Ammissione completata'; btn.disabled=true; btn.style.opacity='.5'; btn.style.cursor='default';
+    btn.innerHTML='Ammissione completata <span class="material-symbols-outlined" style="margin-left:10px">check</span>'; btn.disabled=true; btn.style.cursor='default';
     granted.style.display='flex'; locked.style.display='none'; granted.setAttribute('data-visible','1');
   } else {
     granted.style.display='none'; locked.style.display='block'; granted.removeAttribute('data-visible');
@@ -1211,6 +1209,7 @@ function startBoot(){
 /* ---- init ---- */
 document.getElementById('regNazionalita').innerHTML=nazionalitaOptionsHTML('');
 renderRegolamento(); renderPercorsiList(); renderMappaCards(); renderTickets(); renderAttracchi();
+attracchi.forEach(function(a){ showStamp(a.area); });
 renderDettaglio(ROUTES[0].id); updateSigillo();
 syncFromHash();
 startBoot();
