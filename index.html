@@ -34,7 +34,7 @@
   --linep:rgba(242,238,230,.22);
   /* Stack Sans Text è il font previsto (Regular in tutta l'app); non è un font web pubblico e qui non è
      incorporato via @font-face, quindi finché non viene fornito il file finisce sempre sul fallback
-     Hanken Grotesk. .notch (italic+600) resta lo stand-in del taglio Notch per le parole di soglia/Sabir. */
+     Hanken Grotesk. .notch (solo cambio di font, niente corsivo né peso diverso) resta lo stand-in del taglio Notch per le parole di soglia/Sabir. */
   --disp:'Stack Sans Text','Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
   --mono:'Space Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
 }
@@ -59,8 +59,9 @@ button{font-family:var(--disp)}
 
 /* header — barra unica fedele a Figma: margine 20px solo a sinistra, filo a destra, altezza 72px (9 righe) */
 .apphead{position:sticky;top:0;z-index:30;color:var(--paper)}
-.viewport:has(#s-libera.on #lp-granted[data-visible]) .apphead{background:var(--bordeaux)}
+.viewport:has(#s-libera.on #lp-granted[data-visible]) .apphead{background:transparent}
 .viewport:has(#s-profilo.on) .apphead{background:var(--bordeaux)}
+.viewport:has(#s-regolamento.on) .apphead{background:var(--bordeaux)}
 .ah-bar{position:relative;height:72px;margin-left:20px;background:#000;display:flex;align-items:center;justify-content:flex-start;padding:0}
 .ah-logo{height:36px;width:auto;margin-left:8px;filter:brightness(0) invert(1);cursor:pointer}
 
@@ -84,9 +85,9 @@ button{font-family:var(--disp)}
    left:20px allineato al margine dell'header: lascia visibile la striscia di margine anche a menu aperto. */
 .navigation{position:absolute;overflow:hidden;top:100%;left:20px;right:0;height:0;background:#000;
   transition:height .5s cubic-bezier(.87,0,.13,1)}
-.navigation .content{height:calc(100vh - 72px);display:flex;flex-direction:column;justify-content:space-between;
+.navigation .content{height:calc(min(100dvh,932px) - 72px);display:flex;flex-direction:column;justify-content:space-between;
   opacity:0;transition:opacity .5s cubic-bezier(.87,0,.13,1)}
-.apphead.open .navigation{height:calc(100vh - 72px);overflow:auto}
+.apphead.open .navigation{height:calc(min(100dvh,932px) - 72px);overflow:auto}
 .apphead.open .navigation .content{opacity:1}
 
 .navlinks{display:flex;flex-direction:column;list-style:none;padding:0;margin:0;border-top:1px solid #fff}
@@ -94,12 +95,17 @@ button{font-family:var(--disp)}
 .navlinks li button{width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #fff;
   color:inherit;font-family:var(--disp);font-weight:400;font-size:28px;letter-spacing:-.02em;
   padding:16px 20px;cursor:pointer}
+.navlang{display:flex;align-items:center;gap:10px;padding:16px 20px;justify-content:flex-start}
+.lang-btn{background:none;border:none;color:#fff;font-family:var(--disp);font-weight:400;font-size:16px;
+  cursor:pointer;padding:0;opacity:.5}
+.lang-btn.on{opacity:1;text-decoration:underline;text-underline-offset:3px}
+.navlang-sep{color:#fff;opacity:.4;font-size:16px}
 
 .appscreen{display:none}
 .appscreen.on{display:block}
 .pad{padding:20px 20px 32px}
 .kicker{font-size:12px;font-weight:400;line-height:1.1;}
-.h-title{font-weight:400;letter-spacing:-.025em;line-height:1.1;font-size:28px}
+.h-title{font-weight:400;letter-spacing:-.025em;line-height:1.1;font-size:24px}
 #det-title{font-size:22px}
 .h-hero{font-weight:400;font-size:30px;letter-spacing:-.02em;line-height:1.1}
 .h-big{font-weight:700;font-size:44px;letter-spacing:-.03em;line-height:.95}
@@ -118,8 +124,8 @@ button{font-family:var(--disp)}
 .introlabel{flex:1 1 auto;min-width:0}
 .introicon{width:44px;height:44px;border-radius:50%;border:2px solid var(--paper);display:flex;align-items:center;
   justify-content:center;position:relative;flex:0 0 auto;transition:border-color .3s}
-.introicon::after{content:"";display:block;width:0;height:0;border-top:8px solid transparent;
-  border-bottom:8px solid transparent;border-left:13px solid var(--paper);margin-left:4px}
+.introicon::after{content:"";display:block;width:0;height:0;border-top:5px solid transparent;
+  border-bottom:5px solid transparent;border-left:10px solid var(--paper);margin-left:4px}
 .introbar.open .introicon::before,.introbar.open .introicon::after{content:"";display:block;position:absolute;
   top:50%;left:50%;width:16px;height:2px;background:var(--paper);border:none;margin:0}
 .introbar.open .introicon::before{transform:translate(-50%,-50%) rotate(45deg)}
@@ -164,7 +170,7 @@ button{font-family:var(--disp)}
   padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;
   position:sticky;bottom:calc((var(--total-items) - var(--item-position)) * 56px);
   cursor:pointer;text-align:left;font-family:var(--disp)}
-.percbar .pb-t{font-weight:400;font-size:22px;line-height:1.1;letter-spacing:-.02em;margin:0}
+.percbar .pb-t{font-weight:400;font-size:18px;line-height:1.1;letter-spacing:-.02em;margin:0}
 .percitem{background:var(--bordeaux);color:#fff;position:relative;padding:8px 20px 16px 20px}
 .percitem .pi-s{margin:0;font-size:16px;font-weight:400;line-height:1.1;max-width:320px}
 .percitem .pi-row{display:flex;align-items:center;justify-content:space-between;margin-top:40px}
@@ -174,27 +180,29 @@ button{font-family:var(--disp)}
 .percitem .material-symbols-outlined{font-size:32px}
 
 .attraccorow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;color:#fff;min-height:88px}
-.attraccorow .ar-t{font-weight:400;font-size:22px;line-height:1.1}
-.attraccorow .ar-m{font-size:12px;font-weight:400;line-height:1.1;margin-top:6px}
+.attraccorow .ar-t{font-weight:400;font-size:18px;line-height:1.1}
+.attraccorow .ar-m{font-size:16px;font-weight:400;line-height:1.1;margin-top:6px}
 .attraccorow .ar-icon{width:40px;height:40px;flex:0 0 auto}
-.attraccorow .ar-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+.attraccorow .ar-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:3}
 
-.tappe-item{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;
+.tappe-item{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;
   border-bottom:1px solid #000;gap:16px}
+.tappe-item .tp-num{font-weight:400;font-size:16px;line-height:1.1;flex:0 0 auto}
 .tappe-item .tp-t{font-weight:400;font-size:16px;line-height:1.1}
+.tappe-item .tp-d{font-weight:400;font-size:12px;line-height:1.1;margin-top:4px}
 .tappe-item .tp-icon{width:28px;height:28px;flex:0 0 auto}
 .tappe-item .tp-icon .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
 
 .ticket-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 20px}
 .ticket-row.a{background:var(--bordeaux);color:#fff}
 .ticket-row.b{background:var(--paper);color:var(--ink)}
-.ticket-row .tk-t{font-weight:400;font-size:22px;line-height:1.1}
-.ticket-row .tk-s{font-size:12px;font-weight:400;margin-top:8px;line-height:1.1;max-width:calc(66.667% - 4.667px)}
+.ticket-row .tk-t{font-weight:400;font-size:18px;line-height:1.1}
+.ticket-row .tk-s{font-size:16px;font-weight:400;margin-top:8px;line-height:1.1;max-width:calc(83.333% - 2.333px)}
 .ticket-row .tk-p{font-weight:400;font-size:22px;line-height:1;white-space:nowrap}
 
 .sponsorbar{overflow:hidden;padding:20px 0}
 .sponsortrack{display:flex;gap:20px;width:max-content;animation:sponsorscroll 32s linear infinite}
-.sponsorbar .splogo{flex:0 0 auto;width:116px;height:74px;display:flex;align-items:center;justify-content:center;
+.sponsorbar .splogo{flex:0 0 auto;width:119px;height:77px;display:flex;align-items:center;justify-content:center;
   background:#fff;border-radius:4px;padding:8px}
 .sponsorbar .splogo img{max-width:100%;max-height:100%;object-fit:contain;display:block;filter:grayscale(1)}
 @keyframes sponsorscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
@@ -229,12 +237,11 @@ button{font-family:var(--disp)}
 .areacard .ac-icon{width:60px;height:60px;flex:0 0 auto}
 .areacard .ac-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
 .areacard .ac-nums{font-family:var(--mono);font-size:24px;line-height:1.1;letter-spacing:.05em;white-space:nowrap}
-.areacard .ac-nums span{cursor:pointer}
-.areacard .ac-nums span.on{opacity:1}
+.areacard .ac-nums span{cursor:pointer;opacity:.4}
 .areacard .ac-nums span.on{opacity:1}
 
 .stamp-slot{position:relative;height:422px;margin:0 20px}
-.stamp-slot img{position:absolute;width:136px;height:136px;opacity:0;cursor:grab;touch-action:none;
+.stamp-slot img{position:absolute;width:160px;height:160px;opacity:0;cursor:grab;touch-action:none;
   transform:scale(.6) rotate(var(--rot,0deg));transition:opacity .35s ease,transform .35s ease}
 .stamp-slot img.show{opacity:1;transform:scale(1) rotate(var(--rot,0deg))}
 
@@ -248,7 +255,7 @@ button{font-family:var(--disp)}
   padding:16px 0;font-family:var(--disp);font-size:16px;font-weight:400;line-height:1.1;text-align:left;cursor:pointer;color:inherit}
 .areapick-btn:first-of-type{border-top:none;margin-top:16px}
 .areapick-btn .aic-wrap{width:28px;height:28px;flex:0 0 auto}
-.areapick-btn .aic-wrap .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
+.areapick-btn .aic-wrap .aic{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:4}
 .stamp-slot img.dragging{cursor:grabbing;transition:none}
 
 /* boot — caricamento + registrazione, prima schermata mostrata all'accesso */
@@ -257,7 +264,7 @@ button{font-family:var(--disp)}
   padding:20px;box-sizing:border-box}
 .boot-logo{width:96px;height:auto;filter:brightness(0) invert(1)}
 .boot-form{width:100%;max-width:320px}
-.boot-field{display:block;width:100%;text-align:left;margin-bottom:24px}
+.boot-field{display:block;width:100%;text-align:left;margin-bottom:16px}
 .boot-field span{display:block;font-size:12px;font-weight:400;margin-bottom:8px;line-height:1.1}
 .boot-field input,.boot-field select{width:100%;background:transparent;border:none;
   border-bottom:1.5px solid rgba(255,255,255,.5);color:#fff;font-family:var(--disp);font-size:16px;
@@ -277,7 +284,7 @@ button{font-family:var(--disp)}
 
 .cert{padding:20px 20px 32px;text-align:center;color:#fff}
 .cert .ct-mark{width:130px;height:auto;display:block;margin:0 auto 36px;filter:brightness(0) invert(1)}
-.cert .ct-k{position:absolute;top:20px;left:0;right:0;font-size:12pt;font-weight:400;line-height:1.1;opacity:1}
+.ct-k{position:absolute;top:20px;left:0;right:0;font-size:12px;font-weight:400;line-height:1.1;opacity:1}
 .cert .ct-title{font-size:28px;margin:16px 0 16px}
 .cert .ct-body{font-size:16px;font-weight:400;line-height:1.1;max-width:300px;margin:0 auto}
 .cert .ct-date{font-size:12px;font-weight:400;line-height:1.1;margin-top:30px}
@@ -316,14 +323,19 @@ body.grid-off .gridlayer{display:none}
         <nav class="navigation">
           <div class="content">
             <ul class="navlinks">
-              <li><button onclick="go('libera')">Libera pratica</button></li>
-              <li><button onclick="go('sigillo')">Sigillo</button></li>
-              <li><button onclick="go('percorsi')">Percorsi</button></li>
-              <li><button onclick="go('mappa')">Mappa</button></li>
-              <li><button onclick="go('biglietti')">Biglietti</button></li>
-              <li><button onclick="go('regolamento')">Regolamento</button></li>
-              <li><button onclick="go('profilo')">Profilo</button></li>
+              <li><button onclick="go('libera')" data-en="Free Pratique">Libera pratica</button></li>
+              <li><button onclick="go('sigillo')" data-en="Seal">Sigillo</button></li>
+              <li><button onclick="go('percorsi')" data-en="Routes">Percorsi</button></li>
+              <li><button onclick="go('mappa')" data-en="Map">Mappa</button></li>
+              <li><button onclick="go('biglietti')" data-en="Tickets">Biglietti</button></li>
+              <li><button onclick="go('regolamento')" data-en="Rules">Regolamento</button></li>
+              <li><button onclick="go('profilo')" data-en="Profile">Profilo</button></li>
             </ul>
+            <div class="navlang">
+              <button class="lang-btn" data-lang="it" onclick="setLang('it')">IT</button>
+              <span class="navlang-sep">/</span>
+              <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+            </div>
           </div>
         </nav>
       </div>
@@ -331,7 +343,7 @@ body.grid-off .gridlayer{display:none}
       <!-- HOME -->
       <div class="appscreen on" id="s-home">
         <div class="pad" style="padding-bottom:20px">
-          <p class="h-hero"><span class="notch">Sabir</span>, cittadino de questo mare. <span class="notch">Bono viaggio</span> — sei giunto al porto di Ancona.</p>
+          <p class="h-hero" data-en="<span class='notch'>Sabir</span>, citizen of this sea. <span class='notch'>Bono viaggio</span> — you've reached the port of Ancona."><span class="notch">Sabir</span>, cittadino de questo mare. <span class="notch">Bono viaggio</span> — sei giunto al porto di Ancona.</p>
         </div>
         <div class="duo" style="height:152px;margin-top:96px">
           <div class="imgph"><video src="asset/video/video_ancona_6_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
@@ -340,7 +352,7 @@ body.grid-off .gridlayer{display:none}
         <div class="introbar" id="introBar">
           <div class="introhead">
             <button class="introbtn" onclick="toggleIntro()">
-              <span class="introlabel"><span style="display:block;font-size:18px;font-weight:400;line-height:1.1;text-align:left">Per iniziare ascolta</span><span style="display:block;font-size:18px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left">la storia del Lazzaretto</span></span>
+              <span class="introlabel"><span data-en="To start, listen to" style="display:block;font-size:18px;font-weight:400;line-height:1.1;text-align:left">Per iniziare ascolta</span><span data-en="the story of the Lazzaretto" style="display:block;font-size:18px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left">la storia del Lazzaretto</span></span>
               <span class="introicon"></span>
             </button>
           </div>
@@ -354,44 +366,44 @@ body.grid-off .gridlayer{display:none}
           </div>
         </div>
         <div class="pad" style="position:relative;padding-top:20px">
-          <p style="font-size:28px;font-weight:400;line-height:1.1;color:var(--ink)">Il tuo sigillo</p>
-          <p style="font-size:16px;margin-top:56px;line-height:1.1">Ricorda: per otenner la Libera Pratica ad Ancona dovrai far la tua <span class="notch">contumacia</span>. Mira i luoghi e prendi i sigilli.</p>
-          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Continua l'ammissione <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+          <p style="font-size:24px;font-weight:400;line-height:1.1;color:var(--ink)" data-en="Your seal">Il tuo sigillo</p>
+          <p style="font-size:16px;margin-top:56px;line-height:1.1" data-en="<span class='notch'>Mira</span> the map and choose where to dock. One stop in each of the four areas is all it takes: aim for variety!"><span class="notch">Mira</span> la mappa e scegli dove attraccare. Ti basta una tappa per ciascuna delle quattro aree: punta sulla varietà!</p>
+          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="go('sigillo')"><span data-en="Continue admission">Continua l'ammissione</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
         </div>
         <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
-          <p style="color:#fff;font-size:28px;font-weight:400;line-height:1.1">Percorsi vicino a te</p>
-          <p style="color:#fff;font-size:16px;line-height:1.1;margin-top:136px">Andara per le vie: le rotte più vicine a te iniziano a un passo.</p>
+          <p style="color:#fff;font-size:24px;font-weight:400;line-height:1.1" data-en="Routes near you">Percorsi vicino a te</p>
+          <p style="color:#fff;font-size:16px;line-height:1.1;margin-top:146px" data-en="<span class='notch'>Andara</span> through the streets. The nearest routes start just a step away."><span class="notch">Andara</span> per le vie. Le rotte più vicine partono a un passo da te.</p>
         </div>
         <div class="percblock" style="--total-items:3">
           <button class="percbar" style="--item-position:1" onclick="go('dettaglio','contumacia')">
-            <h3 class="pb-t">La contumacia gentile</h3>
+            <h3 class="pb-t" data-en="The Gentle Quarantine">La contumacia gentile</h3>
           </button>
           <div class="percitem">
-            <p class="pi-s"><span class="notch">Spettar</span> e capire — l'attesa raccontata da chi la costruì.</p>
+            <p class="pi-s" data-en="<span class='notch'>Spettar</span> and understand — the wait, told by those who built it."><span class="notch">Spettar</span> e capire — l'attesa raccontata da chi la costruì.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~60 min</span><span>3 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 450 m</span><span data-en="3 stops">3 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
 
           <button class="percbar" style="--item-position:2" onclick="go('dettaglio','guasco')">
-            <h3 class="pb-t">Il fiato del Guasco</h3>
+            <h3 class="pb-t" data-en="The Breath of Guasco">Il fiato del Guasco</h3>
           </button>
           <div class="percitem">
-            <p class="pi-s"><span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.</p>
+            <p class="pi-s" data-en="<span class='notch'>Andara</span> uphill — from the park to the hill, where the city breathes."><span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~110 min</span><span>5 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 1,3 km</span><span data-en="5 stops">5 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
 
           <button class="percbar" style="--item-position:3" onclick="go('dettaglio','sale')">
-            <h3 class="pb-t">La rotta del sale</h3>
+            <h3 class="pb-t" data-en="The Salt Route">La rotta del sale</h3>
           </button>
           <div class="percitem">
-            <p class="pi-s"><span class="notch">Servir</span> il porto — raccontato da chi lo ha disegnato.</p>
+            <p class="pi-s" data-en="<span class='notch'>Servir</span> the port — told by those who sang it."><span class="notch">Servir</span> il porto — raccontato da chi lo ha cantato.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M9 5v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> ~80 min</span><span>4 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 900 m</span><span data-en="4 stops">4 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
@@ -405,16 +417,16 @@ body.grid-off .gridlayer{display:none}
       <!-- REGOLAMENTO -->
       <div class="appscreen" id="s-regolamento">
         <div class="block bordeaux" style="padding-bottom:16px;padding-top:20px">
-          <h2 class="h-title" style="color:#fff">Il Regolamento</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Per l'ammissione, basta caminar la città — non correrla. Quattro luoghi, quattro anime. Il resto è andar libero.</p>
+          <h2 class="h-title" style="color:#fff" data-en="The Rules">Il Regolamento</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="For admission you don't need to rush. <span class='notch'>Andara</span> through Ancona and touch the four areas: the rest is free.">Per l'ammissione non serve correre. <span class="notch">Andara</span> per Ancona e tocca le quattro aree: il resto è libero.</p>
         </div>
         <div id="regolamento-atti"></div>
         <div class="ticker">
           <div class="tickertrack">
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
           </div>
         </div>
       </div>
@@ -422,8 +434,8 @@ body.grid-off .gridlayer{display:none}
       <!-- PROFILO -->
       <div class="appscreen" id="s-profilo">
         <div class="block bordeaux" style="padding-bottom:14px;padding-top:20px">
-          <h2 class="h-title" style="color:#fff">Il tuo profilo</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Questi i dati lasciati all'approdo: la tua identità temporanea. Sei pronto per andar nella città.</p>
+          <h2 class="h-title" style="color:#fff" data-en="Your profile">Il tuo profilo</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="The data from your admission, left on arrival. They're your temporary identity in the city: you can update them at any time.">I dati della tua ammissione, lasciati all'approdo. Sono la tua identità temporanea in città: puoi aggiornarli in qualsiasi momento.</p>
         </div>
         <div class="duo" style="height:177px">
           <div class="imgph"><video src="asset/video/video_ancona_1_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
@@ -431,31 +443,39 @@ body.grid-off .gridlayer{display:none}
         </div>
         <div id="profilo-dati"></div>
         <div class="pad" style="padding-top:20px">
-          <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="logoutProfilo()">Esci <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+          <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="logoutProfilo()"><span data-en="Log out">Esci</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
         </div>
         <div class="ticker">
           <div class="tickertrack">
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
-            <span>Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
           </div>
         </div>
       </div>
 
       <!-- PERCORSI (lista) -->
       <div class="appscreen" id="s-percorsi">
-        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Percorsi</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Poche rotte, scelte bene. Ognuna andara per mare e per parco.</p>
+        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title" data-en="Routes">Percorsi</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="Curated itineraries between sea, city and park. <span class='notch'>Andara</span> with a voice, at your own pace.">Itinerari curati tra mare, città e parco. <span class="notch">Andara</span> con una voce, a tuo ritmo.</p>
         </div>
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px">
-          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;text-align:right">Percorsi possibili</span>
+          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;text-align:right" data-en="Possible routes">Percorsi possibili</span>
           <span class="h-big" style="display:block;font-weight:400;line-height:.85;font-size:50px;margin-top:8px;text-align:right">12</span>
         </div>
+        <div class="duo" style="height:177px">
+          <div class="imgph"><img src="asset/img/ancona_10.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="swatch imgph" style="background:#fff"></div>
+        </div>
         <div id="percorsi-list"></div>
-        <div class="duo">
-          <div class="imgph" style="flex:1 1 0;aspect-ratio:1/1"><img src="asset/img/ancona_4.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
-          <div class="swatch imgph" style="width:auto;flex:1 1 0;aspect-ratio:1/1;background:var(--bordeaux)"></div>
+        <div class="ticker" style="background:var(--bordeaux)">
+          <div class="tickertrack">
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+          </div>
         </div>
       </div>
 
@@ -472,11 +492,27 @@ body.grid-off .gridlayer{display:none}
           <p style="font-size:16px;font-weight:400;margin-top:56px;line-height:1.1" id="det-desc"></p>
         </div>
         <div class="mapbox" id="det-map" style="width:100%;aspect-ratio:1/1;margin-top:16px;background:#C7C7C0"></div>
-        <div id="det-meta" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:#fff;font-size:16px;font-weight:400;line-height:1.1"></div>
+        <div id="det-meta" style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:16px 20px;color:#fff;font-size:16px;font-weight:400;line-height:1.1"></div>
+        <div class="introbar">
+          <div class="introhead">
+            <div class="introbtn" style="cursor:default">
+              <span class="introlabel"><span id="det-intro-l1" style="display:block;font-size:18px;font-weight:400;line-height:1.1;text-align:left" data-en="Listen to the introduction">Ascolta l'introduzione</span><span id="det-intro-l2" style="display:block;font-size:18px;font-weight:400;line-height:1.1;color:#fff;margin-top:2px;text-align:left"></span></span>
+              <span class="introicon"></span>
+            </div>
+          </div>
+        </div>
         <ol id="det-tappe" style="list-style:none;margin:8px 0;padding:0"></ol>
-        <div class="pad" style="padding-top:20px">
-          <button class="appbtn" id="det-cta" onclick="attraccaDaPercorso()">Attracca al primo molo <span class="material-symbols-outlined" style="margin-left:10px">add</span></button>
-          <button class="appbtn ghost" style="margin-top:8px" onclick="go('biglietti')" id="det-ticket">Biglietto del percorso · 8 €</button>
+        <div class="pad" style="padding:20px 20px">
+          <button class="appbtn" id="det-cta" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="attraccaDaPercorso()"><span data-en="Dock at the first mooring">Attracca al primo molo</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">add</span></button>
+        </div>
+        <div class="duo" style="height:177px">
+          <div class="imgph"><img id="det-foto" src="asset/img/ancona_7.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+          <div class="swatch imgph" style="background:var(--bordeaux)"></div>
+        </div>
+        <div class="pad" style="padding:20px 20px">
+          <button class="appbtn ghost" style="padding:12px 16px;font-size:16px" onclick="go('biglietti')" id="det-ticket" data-en="Route ticket · €6">Biglietto del percorso · 6 €</button>
+          <button class="appbtn ghost" style="margin-top:8px;padding:12px 16px;font-size:16px" onclick="go('biglietti')" id="det-ticket2"></button>
+          <button class="appbtn" style="margin-top:16px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="go('biglietti')"><span data-en="Go to the ticket office">Vai alla biglietteria</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
         </div>
       </div>
 
@@ -486,8 +522,8 @@ body.grid-off .gridlayer{display:none}
           <div class="imgph"><img src="asset/img/ancona_3.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
           <div class="swatch imgph" style="background:var(--bordeaux)"></div>
         </div>
-        <div class="pad" style="padding-bottom:8px;padding-top:20px"><h2 class="h-title">Mappa</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:56px;line-height:1.1">Gli attracchi per le quattro aree. Mira la mappa, scegli dove scender a terra.</p>
+        <div class="pad" style="padding-bottom:8px;padding-top:20px"><h2 class="h-title" data-en="Map">Mappa</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:56px;line-height:1.1" data-en="<span class='notch'>Andara</span> wherever you want: places and events in the four areas, in four colours."><span class="notch">Andara</span> dove vuoi: luoghi ed eventi delle quattro aree, in quattro colori.</p>
         </div>
         <div class="mapbox" id="osmMap" style="width:100%;aspect-ratio:4/3;margin-top:16px;background:#C7C7C0"></div>
         <div class="areacards" id="mappa-cards"></div>
@@ -495,12 +531,12 @@ body.grid-off .gridlayer{display:none}
 
       <!-- SIGILLO -->
       <div class="appscreen" id="s-sigillo">
-        <div class="pad" style="padding-bottom:0"><h2 class="h-title">Il Sigillo</h2></div>
+        <div class="pad" style="padding-bottom:0"><h2 class="h-title" data-en="The Seal">Il Sigillo</h2></div>
         <div class="stamp-slot" id="stampSlot"></div>
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px;margin-top:8px">
-          <p style="font-size:28px;font-weight:400;line-height:1.1;color:#fff">Attracchi registrati</p>
-          <p style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px">Se lo sigillo non appare da solo, registra il tuo attracco a mano qui sotto.</p>
-          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px" id="stampBtn" onclick="registerAttracco()">Registra attracco <span class="material-symbols-outlined" style="margin-left:10px">add</span></button>
+          <p style="font-size:24px;font-weight:400;line-height:1.1;color:#fff" data-en="Registered moorings">Attracchi registrati</p>
+          <p id="sigillo-gps-text" style="font-size:16px;font-weight:400;line-height:1.1;color:#fff;margin-top:56px" data-en="If GPS doesn't detect your mooring, register it by hand below. It only works if you're near the place.">Se il GPS non rileva il tuo attracco, registralo a mano qui sotto. Funziona solo se sei vicino al luogo.</p>
+          <button class="appbtn" style="margin-top:56px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" id="stampBtn" onclick="registerAttracco()"><span data-en="Register mooring">Registra attracco</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">add</span></button>
         </div>
         <div id="attracchi"></div>
         <div class="duo" style="height:177px">
@@ -511,8 +547,8 @@ body.grid-off .gridlayer{display:none}
 
       <!-- BIGLIETTI -->
       <div class="appscreen" id="s-biglietti">
-        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title">Biglietteria</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1">Un solo varco. Pacchetti per andar per eventi e luoghi. La Libera Pratica non si vende mai.</p>
+        <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title" data-en="Ticket office">Biglietteria</h2>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="A single gateway for routes, events and places. Here <span class='notch'>danara</span> only serves the journey: the Free Pratique is not for sale.">Un solo varco per percorsi, eventi e luoghi. Qui la <span class="notch">danara</span> serve solo al viaggio: la Libera Pratica non si compra.</p>
         </div>
         <div class="duo" style="height:177px">
           <div class="imgph"><img src="asset/img/ancona_1.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
@@ -542,48 +578,50 @@ body.grid-off .gridlayer{display:none}
         </div>
         <div id="ticket-table"></div>
         <div class="pad" style="padding-top:0">
-          <button class="appbtn" style="margin-top:32px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px">Acquista i biglietti <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+          <button class="appbtn" style="margin-top:32px;margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px"><span data-en="Buy tickets">Acquista i biglietti</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
         </div>
       </div>
 
       <!-- LIBERA PRATICA -->
       <div class="appscreen" id="s-libera">
         <div id="lp-locked" class="block" style="position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;color:#000">
-          <div style="transform:translateY(250px)">
-            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000">La tua Libera<br>Pratica ti attende</div>
-            <p style="font-size:16px;font-weight:400;line-height:1.1;margin-top:16px;color:#000">Faz un attracco per ognuna delle quattro<br>aree per compir la tua ammissione.</p>
+          <div style="width:100%;box-sizing:border-box;padding:0 20px">
+            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000" data-en="Your Free Pratique<br>awaits you">La tua Libera<br>Pratica ti attende</div>
+            <p style="font-size:16px;font-weight:400;line-height:1.1;margin-top:26px;color:#000" data-en="You need a mooring in each of the four areas. <span class='notch'>Spettar</span> a little longer: admission is near.">Ti serve un attracco in ognuna delle quattro aree. <span class="notch">Spettar</span> ancora un po': l'ammissione è vicina.</p>
+            <button class="appbtn" style="margin-top:100px;margin-left:auto;margin-right:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="go('sigillo')"><span data-en="Go to the Seal">Vai al Sigillo</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
           </div>
-          <button class="appbtn" style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);margin:0;width:calc(75% - 4px);padding:12px 16px" onclick="go('sigillo')">Vai al Sigillo <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
         </div>
-        <div id="lp-granted" class="block bordeaux" style="display:none;position:relative;box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;text-align:center">
-          <div class="cert">
-            <p class="ct-k">Porto di Ancona · MMXXVIII</p>
+        <div id="lp-granted" class="block" style="display:none;position:relative;box-sizing:border-box;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff">
+          <video autoplay muted loop playsinline preload="auto" src="asset/video/video_ancona_7_bw.mp4" style="position:absolute;top:-72px;left:0;right:0;height:calc(100% + 72px);width:100%;object-fit:cover"></video>
+          <div id="lp-granted-tint" style="position:absolute;top:-72px;left:0;right:0;height:calc(100% + 72px);background:var(--bordeaux);opacity:1"></div>
+          <p class="ct-k" style="position:absolute" data-en="Port of Ancona · MMXXVIII">Porto di Ancona · MMXXVIII</p>
+          <div class="cert" style="position:relative">
             <img class="ct-mark" src="asset/loghi/logo-stella.svg" alt="">
-            <div class="ct-title notch">Libera Pratica</div>
-            <div class="ct-body">Si concede a <span class="notch">Ospite del Mondo</span> l'ammissione in questa città, cessata la contumacia e visitati mare e parco. Da questo giorno è dichiarato cittadino temporaneo di «Questo Adesso».</div>
-            <p class="ct-date">Rilasciato · 14 giugno</p>
+            <div class="ct-title notch" data-en="Free Pratique">Libera Pratica</div>
+            <div class="ct-body" data-en="Granted to <span class='notch'>Guest of the World</span> admission to this city, quarantine ended and sea and park visited. From this day declared temporary citizen of «Questo Adesso».">Si concede a <span class="notch">Ospite del Mondo</span> l'ammissione in questa città, cessata la contumacia e visitati mare e parco. Da questo giorno è dichiarato cittadino temporaneo di «Questo Adesso».</div>
+            <p class="ct-date" data-en="Issued · 14 June">Rilasciato · 14 giugno</p>
           </div>
           <div style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);display:flex;gap:8px;width:calc(75% - 4px);margin:0">
-            <button class="appbtn" style="flex:1;justify-content:center;padding:12px;margin:0;font-size:16px" onclick="alert('Download in arrivo!')">Scarica <span class="material-symbols-outlined" style="margin-left:8px;font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24">arrow_downward</span></button>
-            <button class="appbtn" style="flex:1;justify-content:center;padding:12px;margin:0;font-size:16px" onclick="if(navigator.share){navigator.share({title:'Libera Pratica',text:'Ho ottenuto la Libera Pratica ad Ancona!',url:window.location.href})}else{alert('Condivisione non supportata.')}">Condividi <span class="material-symbols-outlined" style="margin-left:8px;font-variation-settings:'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24">share</span></button>
+            <button class="appbtn" style="flex:1;justify-content:center;padding:12px 16px;margin:0;font-size:16px" onclick="downloadCert()"><span data-en="Download">Scarica</span> <span class="material-symbols-outlined" style="margin-left:8px;font-size:22px">arrow_downward</span></button>
+            <button class="appbtn" style="flex:1;justify-content:center;padding:12px 16px;margin:0;font-size:16px" onclick="shareCert()"><span data-en="Share">Condividi</span> <span class="material-symbols-outlined" style="margin-left:8px;font-size:22px">share</span></button>
           </div>
         </div>
       </div>
 
     <div class="pagefooter">
-      <button class="pf-link" onclick="go('libera')">Libera pratica</button>
-      <button class="pf-link" onclick="go('sigillo')">Sigillo</button>
-      <button class="pf-link" onclick="go('percorsi')">Percorsi</button>
-      <button class="pf-link" onclick="go('mappa')">Mappa</button>
-      <button class="pf-link" onclick="go('biglietti')">Biglietti</button>
-      <button class="pf-link" onclick="go('regolamento')">Regolamento</button>
-      <button class="pf-link" onclick="go('profilo')">Profilo</button>
-      <div class="pf-legal"><span>Privacy</span><span>© 2028 Libera Pratica — Ancona</span></div>
+      <button class="pf-link" onclick="go('libera')" data-en="Free Pratique">Libera pratica</button>
+      <button class="pf-link" onclick="go('sigillo')" data-en="Seal">Sigillo</button>
+      <button class="pf-link" onclick="go('percorsi')" data-en="Routes">Percorsi</button>
+      <button class="pf-link" onclick="go('mappa')" data-en="Map">Mappa</button>
+      <button class="pf-link" onclick="go('biglietti')" data-en="Tickets">Biglietti</button>
+      <button class="pf-link" onclick="go('regolamento')" data-en="Rules">Regolamento</button>
+      <button class="pf-link" onclick="go('profilo')" data-en="Profile">Profilo</button>
+      <div class="pf-legal"><span data-en="Privacy">Privacy</span><span data-en="© 2028 Free Pratique — Ancona">© 2028 Libera Pratica — Ancona</span></div>
     </div>
 
     <div class="areapick-overlay" id="areaPickOverlay" onclick="closeAreaPick()">
       <div class="areapick-sheet" onclick="event.stopPropagation()">
-        <p style="font-size:16px;font-weight:400;line-height:1.1">In quale area hai attraccato?</p>
+        <p style="font-size:16px;font-weight:400;line-height:1.1" data-en="Which area did you dock in?">In quale area hai attraccato?</p>
         <div id="areaPickList"></div>
       </div>
     </div>
@@ -594,33 +632,33 @@ body.grid-off .gridlayer{display:none}
 
     <div class="bootscreen" id="bootRegister" style="display:none">
       <div class="boot-form">
-        <img src="asset/loghi/logo.svg" alt="Libera Pratica" style="height:54px;width:auto;filter:brightness(0) invert(1);margin-bottom:50px;transform:translateY(-40px)">
-        <div class="h-title" style="color:#fff;line-height:1.4">Sei in arrivo ad Ancona</div>
-        <p style="font-size:16px;font-weight:400;line-height:1.4;margin-top:0;margin-bottom:52px">Prima di scender a terra, serve qualche dato per l'ammissione.</p>
+        <img src="asset/loghi/logo.svg" alt="Libera Pratica" style="height:54px;width:auto;filter:brightness(0) invert(1);margin-bottom:20px;transform:translateY(-40px)">
+        <div class="h-title" style="color:#fff;font-size:24px;line-height:1.8" data-en="You're arriving in Ancona">Sei in arrivo ad Ancona</div>
+        <p style="font-size:16px;font-weight:400;line-height:1.2;margin-top:0;margin-bottom:52px" data-en="<span class='notch'>Venir</span>. Before going ashore, we need a few details for admission."><span class="notch">Venir</span>. Prima di scender a terra, serve qualche dato per l'ammissione.</p>
         <label class="boot-field">
-          <span>Nome</span>
-          <input type="text" id="regNome" placeholder="Il tuo nome" autocomplete="name">
+          <span data-en="Name">Nome</span>
+          <input type="text" id="regNome" placeholder="Il tuo nome" data-en-ph="Your name" autocomplete="name">
         </label>
         <label class="boot-field">
-          <span>Sesso</span>
+          <span data-en="Gender">Genere</span>
           <select id="regSesso">
-            <option value="">Seleziona</option>
-            <option value="F">Donna</option>
-            <option value="M">Uomo</option>
-            <option value="A">Altro</option>
-            <option value="N">Preferisco non dire</option>
+            <option value="" data-en="Select">Seleziona</option>
+            <option value="F" data-en="Woman">Donna</option>
+            <option value="M" data-en="Man">Uomo</option>
+            <option value="A" data-en="Other">Altro</option>
+            <option value="N" data-en="Prefer not to say">Preferisco non dire</option>
           </select>
         </label>
         <label class="boot-field">
-          <span>Età</span>
-          <input type="number" id="regEta" min="0" max="120" placeholder="La tua età">
+          <span data-en="Age">Età</span>
+          <select id="regEta"></select>
         </label>
         <label class="boot-field" style="margin-bottom:30px">
-          <span>Nazionalità</span>
+          <span data-en="Origin">Provenienza</span>
           <select id="regNazionalita"></select>
         </label>
         <p id="regError" style="font-size:12px;line-height:1.1;min-height:14px;margin-bottom:8px;color:#FFC7C7"></p>
-        <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px" onclick="submitRegistration()">Attracca <span class="material-symbols-outlined" style="margin-left:10px">arrow_forward</span></button>
+        <button class="appbtn" style="margin-left:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="submitRegistration()"><span data-en="Dock">Attracca</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
       </div>
     </div>
 
@@ -630,11 +668,12 @@ body.grid-off .gridlayer{display:none}
 
 <script>
 var AREAS={
-  mare:{name:'Questo Mare',color:'var(--blu)',hex:'#005FA0'},
-  maestra:{name:'Via Maestra',color:'var(--rosso)',hex:'#D82E1D'},
-  parco:{name:'Adesso Parco',color:'var(--verde)',hex:'#3E8638'},
-  culturale:{name:'Mare Culturale',color:'var(--giallo)',hex:'#F8B217'}
+  mare:{name:{it:'Questo Mare',en:'This Sea'},color:'var(--blu)',hex:'#005FA0'},
+  maestra:{name:{it:'Via Maestra',en:'Main Street'},color:'var(--rosso)',hex:'#D82E1D'},
+  parco:{name:{it:'Adesso Parco',en:'Park Now'},color:'var(--verde)',hex:'#3E8638'},
+  culturale:{name:{it:'Mare Culturale',en:'Cultural Sea'},color:'var(--giallo)',hex:'#F8B217'}
 };
+function areaName(key){ return AREAS[key].name[currentLang]||AREAS[key].name.it }
 function areaIcon(key){
   var m={
     mare:'<path d="M3 13c2 0 2-3 4-3s2 3 4 3 2-3 4-3 2 3 4 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
@@ -648,41 +687,106 @@ function timeIcon(){return '<svg width="15" height="15" viewBox="0 0 18 18"><cir
 function arrowIcon(){return '<span class="material-symbols-outlined" style="font-size:22px">arrow_forward</span>';}
 
 var ROUTES=[
-  {id:'contumacia',title:'La contumacia gentile',subtitle:"<span class='notch'>Spettar</span> e capire — l'attesa raccontata da chi la costruì.",narratore:'Vanvitelli',minuti:60,aree:['culturale','mare'],heroArea:'culturale',
-   desc:"Prima di essere ammessi, si spettava (aspettava). La Mole custodisce ancora il tempo sospeso della quarantena — un cortile, una sala, una banchina. Venir piano, sabir con calma: qui il rito comincia dal silenzio, non dal movimento.",
-   tappe:[{name:'Mole Vanvitelliana — cortile',area:'culturale',lng:13.5044,lat:43.6144},{name:'Lazzaretto — sale espositive',area:'culturale',lng:13.5040,lat:43.6146},{name:'Banchina del sale',area:'mare',lng:13.5031,lat:43.6153}]},
-  {id:'guasco',title:'Il fiato del Guasco',subtitle:'<span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.',narratore:'Ciriaco',minuti:110,aree:['parco','maestra'],heroArea:'parco',
-   desc:'Il percorso più lungo, per chi non ha fretta. Si sale tra il verde del Cardeto fino al Duomo, makach corse, con la città che si apre sotto di te a ogni tappa. Mira — guarda quanto cresce la vista salendo.',
-   tappe:[{name:'Parco del Cardeto',area:'parco',lng:13.5194,lat:43.6218},{name:'Colle Guasco',area:'parco',lng:13.5104,lat:43.6258},{name:'Duomo di San Ciriaco',area:'maestra',lng:13.5102,lat:43.6253},{name:'Teatro delle Muse',area:'maestra',lng:13.5101,lat:43.6196},{name:'Mercato coperto',area:'maestra',lng:13.5141,lat:43.6185}]},
-  {id:'sale',title:'La rotta del sale',subtitle:'<span class="notch">Servir</span> il porto — raccontato da chi lo ha disegnato.',narratore:'Corelli',minuti:80,aree:['mare','parco'],heroArea:'mare',
-   desc:"Dal molo alla banchina, dove le merci aspettavano il permesso di entrare in città. Trabajar e commerciare, danara e destino si intrecciavano proprio qui, sul confine tra il mare e la città.",
-   tappe:[{name:"Molo d'attracco",area:'mare',lng:13.5014,lat:43.6142},{name:'Arco di Traiano',area:'mare',lng:13.5065,lat:43.6253},{name:'Parco del Cardeto (ingresso mare)',area:'parco',lng:13.5220,lat:43.6205},{name:'Faro vecchio',area:'parco',lng:13.5145,lat:43.6233}]}
+  {id:'contumacia',
+   title:{it:'La contumacia gentile',en:'The Gentle Quarantine'},
+   subtitle:{it:"<span class='notch'>Spettar</span> e capire — l'attesa raccontata da chi la costruì.",en:"<span class='notch'>Spettar</span> and understand — the wait, told by those who built it."},
+   narratore:'Luigi Vanvitelli',minuti:60,distanza:'450 m',foto:'asset/img/ancona_7.jpg',aree:['culturale','mare'],heroArea:'culturale',
+   ticket2:{it:'Biglietto con apertura serale',en:'Ticket with evening opening'},ticket2Prezzo:'12 €',
+   desc:{it:"Prima di essere ammessi, bisognava aspettare. La Mole custodisce ancora il tempo sospeso della quarantena: un cortile, una sala, una banchina. <span class='notch'>Venir</span> piano: qui il rito comincia dal silenzio, non dal movimento.",
+         en:"Before being admitted, one had to wait. The Mole still holds the suspended time of quarantine: a courtyard, a hall, a quay. <span class='notch'>Venir</span> slowly: here the rite begins with silence, not with movement."},
+   tappe:[
+     {name:'Mole Vanvitelliana — cortile',area:'culturale',lng:13.5044,lat:43.6144,
+      desc:{it:"Il punto d'ingresso, dove le navi attendevano il permesso.",en:'The entry point, where ships awaited permission.'}},
+     {name:'Lazzaretto — sale espositive',area:'culturale',lng:13.5040,lat:43.6146,
+      desc:{it:'Le stanze della quarantena, oggi spazi della Mole.',en:'The quarantine rooms, today exhibition spaces of the Mole.'}},
+     {name:'Banchina del sale',area:'mare',lng:13.5031,lat:43.6153,
+      desc:{it:'Dove le merci aspettavano di entrare in città.',en:'Where goods waited to enter the city.'}},
+     {name:{it:'Evento agganciato',en:'Linked event'},
+      desc:{it:'Apertura serale della Mole - Attracco valido dalle 21:00 alle 23:00.',en:'Evening opening of the Mole - Mooring valid from 9:00 PM to 11:00 PM.'}},
+     {name:{it:'Realtà locale',en:'Local spot'},
+      desc:{it:'Una bottega storica del porto: una sosta con un racconto.',en:'A historic shop of the port: a stop with a story.'}}
+   ]},
+  {id:'guasco',
+   title:{it:'Il fiato del Guasco',en:'The Breath of Guasco'},
+   subtitle:{it:'<span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.',en:'<span class="notch">Andara</span> uphill — from the park to the hill, where the city breathes.'},
+   narratore:'Ciriaco',minuti:110,distanza:'1,3 km',foto:'asset/img/ancona_8.jpg',aree:['parco','maestra'],heroArea:'parco',
+   ticket2:{it:'Biglietto con concerto',en:'Ticket with concert'},ticket2Prezzo:'14 €',
+   desc:{it:"<span class='notch'>Makach</span> fretta: è il percorso più lungo, per chi vuole salire piano. Si parte dal verde del Cardeto e si arriva al Duomo; a ogni tappa la città si apre un po' di più sotto i tuoi occhi.",
+         en:"<span class='notch'>Makach</span> hurry: it's the longest route, for those who want to climb slowly. You start from the green of the Cardeto and arrive at the Duomo; at every stop the city opens up a little more before your eyes."},
+   tappe:[
+     {name:'Parco del Cardeto',area:'parco',lng:13.5194,lat:43.6218,
+      desc:{it:'Il verde che si affaccia sul mare. Da qui si comincia a salire.',en:'The green that overlooks the sea. From here the climb begins.'}},
+     {name:'Colle Guasco',area:'maestra',lng:13.5104,lat:43.6258,
+      desc:{it:'Il punto più alto, con la città, il porto e il mare in un solo sguardo.',en:'The highest point, with the city, the port and the sea in a single glance.'}},
+     {name:'Duomo di San Ciriaco',area:'maestra',lng:13.5102,lat:43.6253,
+      desc:{it:'La cattedrale sul colle, dove il leone del protiro accoglie chi arriva.',en:'The cathedral on the hill, where the lion of the portal welcomes those who arrive.'}},
+     {name:'Teatro delle Muse',area:'maestra',lng:13.5101,lat:43.6196,
+      desc:{it:'Il teatro ottocentesco, cuore delle serate cittadine.',en:"The 19th-century theatre, heart of the city's evenings."}},
+     {name:'Mercato coperto',area:'maestra',lng:13.5141,lat:43.6185,
+      desc:{it:'Si scende tra i banchi, con una sosta presso una realtà locale.',en:'You descend among the stalls, with a stop at a local spot.'}},
+     {name:{it:'Evento agganciato',en:'Linked event'},
+      desc:{it:'Concerto al tramonto al Cardeto - Attracco valido dalle 18:30 alle 20:30.',en:'Sunset concert at the Cardeto - Mooring valid from 6:30 PM to 8:30 PM.'}},
+     {name:{it:'Realtà locale',en:'Local spot'},
+      desc:{it:"L'associazione delle guide del parco: una breve passeggiata guidata.",en:"The park guides' association: a short guided walk."}}
+   ]},
+  {id:'sale',
+   title:{it:'La rotta del sale',en:'The Salt Route'},
+   subtitle:{it:'<span class="notch">Servir</span> il porto — raccontato da chi lo ha cantato.',en:'<span class="notch">Servir</span> the port — told by those who sang it.'},
+   narratore:'Corelli',minuti:80,distanza:'900 m',foto:'asset/img/ancona_9.jpg',aree:['mare','parco'],heroArea:'mare',
+   ticket2:{it:'Biglietto con mercato',en:'Ticket with market'},ticket2Prezzo:'10 €',
+   desc:{it:"Dal molo alla banchina, dove le merci aspettavano il permesso di entrare in città. Qui si faceva <span class='notch'>danara</span> e si decideva il destino, sul confine tra il mare e la città.",
+         en:"From the pier to the quay, where goods waited for permission to enter the city. Here <span class='notch'>danara</span> was made and destiny was decided, on the border between the sea and the city."},
+   tappe:[
+     {name:"Molo d'attracco",area:'mare',lng:13.5014,lat:43.6142,
+      desc:{it:'Punto di partenza e prima soglia. Da qui arrivavano le merci in attesa di ammissione.',en:'Starting point and first threshold. This is where goods arrived awaiting admission.'}},
+     {name:'Arco di Traiano',area:'mare',lng:13.5065,lat:43.6253,
+      desc:{it:'La porta che segna il passaggio dal porto alla città.',en:'The gate that marks the passage from the port to the city.'}},
+     {name:'Parco del Cardeto, ingresso mare',area:'parco',lng:13.5220,lat:43.6205,
+      desc:{it:'Una pausa panoramica lungo la costa, con il verde sul porto.',en:'A scenic pause along the coast, with the green overlooking the port.'}},
+     {name:'Faro vecchio',area:'parco',lng:13.5145,lat:43.6233,
+      desc:{it:"L'ultimo sguardo sul mare, dove la rotta si chiude.",en:'The last look at the sea, where the route closes.'}},
+     {name:{it:'Evento agganciato',en:'Linked event'},
+      desc:{it:'Mercato serale del pescato alla banchina - Attracco valido dalle 19:00 alle 21:00.',en:'Evening catch market at the quay - Mooring valid from 7:00 PM to 9:00 PM.'}},
+     {name:{it:'Realtà locale',en:'Local spot'},
+      desc:{it:'Un banco storico del mercato coperto: una piccola degustazione e il racconto di come è cambiato il commercio del porto.',en:'A historic stall of the covered market: a small tasting and the story of how trade in the port has changed.'}}
+   ]}
 ];
 
 var TICKETS=[
-  {t:'Percorso singolo',s:'4 tappe mappa + audio-racconto del narratore',p:'8 €'},
-  {t:'Percorso + evento',s:'Percorso singolo + ingresso a 1 evento di palinsesto agganciato (anche serale)',p:'14 €'},
-  {t:'La contumacia gentile',s:'Percorso completo + apertura serale della Mole',p:'16 €'},
-  {t:'Il fiato del Guasco',s:'Percorso completo + concerto al tramonto',p:'18 €'},
-  {t:'La rotta del sale',s:'Percorso completo + mercato serale del pescato',p:'15 €'},
-  {t:'Pass «Questo Adesso»',s:'Tutti e 3 i percorsi + 3 eventi agganciati, valido 7 giorni',p:'38 €'},
-  {t:'Pass famiglia',s:'2 adulti + fino a 2 minori · come Pass «Questo Adesso», tariffa cumulativa',p:'95 €'},
-  {t:'Riduzione under 18 / over 65',s:'Su qualunque prodotto sopra',p:'−30%'},
-  {t:'Libera Pratica',s:'Certificato finale di ammissione — non è mai in vendita',p:'Incluso'}
+  {t:{it:'Percorso singolo',en:'Single route'},s:{it:'Tappe sulla mappa + audio-racconto',en:'Map stops + audio story'},p:'6 €'},
+  {t:{it:'Percorso + evento',en:'Route + event'},s:{it:'Un percorso a scelta + un evento del palinsesto',en:'One route of your choice + one schedule event'},p:'13 €'},
+  {t:{it:'La contumacia gentile',en:'The Gentle Quarantine'},s:{it:'Percorso + apertura serale della Mole',en:'Route + evening opening of the Mole'},p:'12 €'},
+  {t:{it:'Il fiato del Guasco',en:'The Breath of Guasco'},s:{it:'Percorso + concerto al tramonto',en:'Route + sunset concert'},p:'14 €'},
+  {t:{it:'La rotta del sale',en:'The Salt Route'},s:{it:'Percorso + mercato serale con degustazione',en:'Route + evening market with tasting'},p:'10 €'},
+  {t:{it:'Pass «Questo Adesso»',en:'«Questo Adesso» Pass'},s:{it:'I 3 percorsi + 3 eventi, valido 7 giorni',en:'All 3 routes + 3 events, valid 7 days'},p:'30 €'},
+  {t:{it:'Pass famiglia',en:'Family pass'},s:{it:'2 adulti + fino a 2 minori, stesso contenuto del Pass',en:'2 adults + up to 2 minors, same content as the Pass'},p:'75 €'},
+  {t:{it:'Under 18 / over 65',en:'Under 18 / over 65'},s:{it:'Su tutti i biglietti, non cumulabile con il Pass famiglia',en:'On all tickets, not combinable with the Family pass'},p:'−30%'},
+  {t:{it:'Bambini sotto i 6 anni',en:'Children under 6'},s:{it:'Su tutti i biglietti',en:'On all tickets'},p:{it:'Gratis',en:'Free'}}
 ];
 
 var MAPPA_CARDS=[
-  {area:'mare',t:'Questo mare',d:'<span class="notch">Venir</span>, cittadino: qui il porto ti ha accolto. Segui la costa e ritrova il molo da cui tutto è cominciato.'},
-  {area:'maestra',t:'Via Maestra',d:'<span class="notch">Andara</span> per la città: qui il cammino si fa strada vera, tra piazze e botteghe che per secoli hanno servito chi arrivava dal mare.'},
-  {area:'parco',t:'Adesso Parco',d:'Qui il fiato della città rallenta. <span class="notch">Makach</span> fretta — solo verde, salite dolci, il colle che guarda il porto.'},
-  {area:'culturale',t:'Mare Culturale',d:'Il Lazzaretto, i musei, i teatri: il patrimonio che Ancona ha tenuto in <span class="notch">contumacia</span> per te, pronto ora a essere vissuto.'}
+  {area:'mare',t:{it:'Questo Mare',en:'This Sea'},d:{it:'<span class="notch">Venir</span>, cittadino: qui il porto ti ha accolto. Segui la costa fino al molo da cui tutto è cominciato.',en:'<span class="notch">Venir</span>, citizen: here the port welcomed you. Follow the coast to the pier where it all began.'}},
+  {area:'maestra',t:{it:'Via Maestra',en:'Main Street'},d:{it:'<span class="notch">Andara</span> per la città: tra piazze e botteghe, la strada che per secoli ha accolto chi arrivava dal mare.',en:'<span class="notch">Andara</span> through the city: among squares and shops, the street that for centuries welcomed those arriving from the sea.'}},
+  {area:'parco',t:{it:'Adesso Parco',en:'Park Now'},d:{it:'<span class="notch">Spettar</span> un attimo: dal Cardeto al Conero il verde si affaccia sul mare. Qui la città prende fiato.',en:'<span class="notch">Spettar</span> a moment: from the Cardeto to the Conero, the green overlooks the sea. Here the city catches its breath.'}},
+  {area:'culturale',t:{it:'Mare Culturale',en:'Cultural Sea'},d:{it:'<span class="notch">Mira</span> la Mole: dove un tempo si aspettava, oggi si crea. Arte, musica e performance sul mare.',en:'<span class="notch">Mira</span> the Mole: where one once waited, today one creates. Art, music and performance on the sea.'}}
 ];
 
 var ATTI=[
-  {t:'Un attracco per ogni porto',b:'Ancona è divisa in quattro anime: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per la tua Libera Pratica faz un attracco in ciascuna.'},
-  {t:'Come prender lo sigillo',b:"Andara sul luogo. L'app ti riconosce, oppure mira il QR sul posto. Fatto: lo sigillo è tuo."},
-  {t:'La tua Libera Pratica',b:'Con un attracco in ogni area, lo cerchio si chiude. La Libera Pratica è pronta: scarica, mostra, andara dove vuoi.'}
+  {t:{it:'Un attracco per area',en:'One mooring per area'},
+   b:{it:'Ancona è divisa in quattro aree: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per ottenere la Libera Pratica ti serve un attracco in ciascuna. Non conta quanti luoghi visiti.',
+      en:"Ancona is divided into four areas: This Sea, Main Street, Park Now, Cultural Sea. To get the Free Pratique you need a mooring in each one. It doesn't matter how many places you visit."}},
+  {t:{it:'Come ottenere un sigillo',en:'How to get a seal'},
+   b:{it:"Vai in un luogo o a un evento. L'app ti riconosce con il GPS e registra l'attracco. Se il GPS non risponde, usa il check-in manuale. Per gli eventi conta l'orario: attracchi mentre si svolgono.",
+      en:"Go to a place or an event. The app recognises you via GPS and registers the mooring. If GPS doesn't respond, use manual check-in. For events, the time counts: you dock while they're happening."}},
+  {t:{it:'La tua Libera Pratica',en:'Your Free Pratique'},
+   b:{it:"<span class='notch'>Bono</span>. Con un attracco in ogni area il sigillo si chiude e la Libera Pratica è tua. Puoi salvarla, mostrarla e condividerla. Resta valida anche dopo la partenza.",
+      en:"<span class='notch'>Bono</span>. With a mooring in every area the seal closes and the Free Pratique is yours. You can save it, show it and share it. It stays valid even after you leave."}}
 ];
+var REGOLAMENTO_NOTA={
+  t:{it:'Nota finale',en:'Final note'},
+  b:{it:'I percorsi sono solo compagnia: puoi seguirli o scegliere da solo i luoghi sulla mappa.',
+     en:'The routes are just company: you can follow them or choose the places on the map yourself.'}
+};
 
 /* persistenza sessione — profilo utente e attracchi restano salvati tra un caricamento e l'altro */
 var LP_USER_KEY='lpUser', LP_ATTRACCHI_KEY='lpAttracchi';
@@ -695,10 +799,46 @@ var currentUser=loadUser();
 var attracchi=loadAttracchi();
 var currentRouteId=null;
 
+/* ---- lingua (IT/EN) ---- */
+var LP_LANG_KEY='lpLang';
+var currentLang=(function(){ try{ return localStorage.getItem(LP_LANG_KEY)||'it' }catch(e){ return 'it' } })();
+function saveLang(l){ try{ localStorage.setItem(LP_LANG_KEY, l) }catch(e){} }
+function L(obj){ if(obj&&typeof obj==='object') return obj[currentLang]||obj.it; return obj }
+function applyStaticLang(){
+  document.querySelectorAll('[data-en]').forEach(function(el){
+    if(el.dataset.it===undefined) el.dataset.it=el.innerHTML;
+    el.innerHTML = currentLang==='en' ? el.dataset.en : el.dataset.it;
+  });
+  document.querySelectorAll('[data-en-ph]').forEach(function(el){
+    if(el.dataset.itPh===undefined) el.dataset.itPh=el.getAttribute('placeholder')||'';
+    el.setAttribute('placeholder', currentLang==='en' ? el.dataset.enPh : el.dataset.itPh);
+  });
+  document.documentElement.lang=currentLang;
+}
+function updateLangButtons(){
+  document.querySelectorAll('.lang-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.lang===currentLang) });
+}
+function setLang(lang){
+  currentLang=lang;
+  saveLang(lang);
+  applyStaticLang();
+  updateLangButtons();
+  var naz=document.getElementById('regNazionalita'); if(naz) naz.innerHTML=nazionalitaOptionsHTML(currentUser?currentUser.nazionalita:'');
+  var eta=document.getElementById('regEta'); if(eta) eta.innerHTML=etaOptionsHTML(currentUser?currentUser.eta:'');
+  renderRegolamento(); renderPercorsiList(); renderMappaCards(); renderTickets(); renderAttracchi();
+  renderDettaglio(currentRouteId||ROUTES[0].id);
+  updateSigillo();
+  if(currentUser) renderProfilo();
+}
+
 function go(id,param){
   document.querySelectorAll('.appscreen').forEach(function(s){s.classList.remove('on')});
   if(id==='dettaglio'){ currentRouteId=param||currentRouteId||ROUTES[0].id; renderDettaglio(currentRouteId); }
   if(id==='profilo'){ renderProfilo(); }
+  if(id==='libera'){
+    var grantedVideo=document.querySelector('#lp-granted video');
+    if(grantedVideo){ var p=grantedVideo.play(); if(p&&p.catch) p.catch(function(){}); }
+  }
   var el=document.getElementById('s-'+id); if(el){el.classList.add('on')}
   var vp=document.getElementById('viewport'); if(vp){vp.scrollTop=0}
   toggleMenu(false);
@@ -736,30 +876,37 @@ function renderPercorsiList(){
   var el=document.getElementById('percorsi-list'); el.innerHTML='';
   ROUTES.forEach(function(r){
     var b=document.createElement('button'); b.className='routerow';
-    b.innerHTML='<h3 class="rr-t">'+r.title+'</h3><p class="rr-s">'+r.subtitle+'</p>'+
-      '<div class="rr-row"><div class="rr-meta"><span>'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+' tappe</span></div>'+arrowIcon()+'</div>';
+    b.innerHTML='<h3 class="rr-t">'+L(r.title)+'</h3><p class="rr-s">'+L(r.subtitle)+'</p>'+
+      '<div class="rr-row"><div class="rr-meta"><span>'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+(currentLang==='en'?' stops':' tappe')+'</span></div>'+arrowIcon()+'</div>';
     b.onclick=function(){go('dettaglio',r.id)};
     el.appendChild(b);
   });
 }
 function renderDettaglio(id){
   var r=ROUTES.filter(function(x){return x.id===id})[0]||ROUTES[0];
-  document.getElementById('det-title').textContent=r.title;
-  document.getElementById('det-desc').textContent=r.desc;
+  document.getElementById('det-title').textContent=L(r.title);
+  document.getElementById('det-desc').innerHTML=L(r.desc);
   var sw=document.getElementById('det-swatch'); sw.style.background=AREAS[r.heroArea].color;
+  var foto=document.getElementById('det-foto'); if(foto&&r.foto) foto.src=r.foto;
+  var t2=document.getElementById('det-ticket2'); if(t2&&r.ticket2) t2.textContent=L(r.ticket2)+' · '+r.ticket2Prezzo;
   var chips=document.getElementById('det-chips'); chips.innerHTML='';
   r.aree.forEach(function(a){
     var s=document.createElement('span'); s.className='areachip'; s.style.color=AREAS[a].color;
-    s.textContent=AREAS[a].name; chips.appendChild(s);
+    s.textContent=areaName(a); chips.appendChild(s);
   });
   var meta=document.getElementById('det-meta'); meta.style.background=AREAS[r.heroArea].color;
-  meta.innerHTML='<span style="display:inline-flex;align-items:center;gap:6px">'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+' tappe</span>';
+  meta.innerHTML='<span style="display:inline-flex;align-items:center;gap:6px;font-size:16px">'+timeIcon()+' ~'+r.minuti+' min</span>'+
+    (r.distanza?'<span style="position:absolute;left:50%;top:16px;transform:translateX(-50%);font-size:16px">'+r.distanza+'</span>':'')+
+    '<span style="font-size:16px">'+r.tappe.length+(currentLang==='en'?' stops':' tappe')+'</span>';
   var tp=document.getElementById('det-tappe'); tp.innerHTML='';
   r.tappe.forEach(function(t,i){
     var li=document.createElement('li'); li.className='tappe-item';
-    li.innerHTML='<span class="tp-t">'+(i+1)+'. '+t.name+'</span><svg class="tp-icon" viewBox="0 0 141.73 141.73" style="color:'+AREAS[t.area].color+'">'+AREA_ICON_SVG[t.area]+'</svg>';
+    li.innerHTML='<span class="tp-num">'+(i+1)+'.</span><div style="flex:1 1 auto;min-width:0"><span class="tp-t">'+L(t.name)+'</span>'+
+      (t.desc?'<p class="tp-d">'+L(t.desc)+'</p>':'')+'</div>';
     tp.appendChild(li);
   });
+  var intro1=document.getElementById('det-intro-l1'), intro2=document.getElementById('det-intro-l2');
+  if(intro1&&intro2){ intro2.textContent=(currentLang==='en'?'by ':'di ')+r.narratore; }
   document.getElementById('det-cta').onclick=function(){attraccaDaPercorso()};
   currentRouteId=id;
 }
@@ -777,29 +924,50 @@ function renderRegolamento(){
   ATTI.forEach(function(a,i){
     var d=document.createElement('div');
     d.style.cssText='background:var(--paper);color:var(--ink);border-top:'+(i===0?'none':'1px solid #000')+';padding:16px 20px 16px';
-    d.innerHTML='<p style="font-weight:400;font-size:24px;line-height:1.1">Atto '+romans[i]+'</p>'+
-      '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:8px">'+a.t+'</p>'+
-      '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:40px">'+a.b+'</p>';
+    d.innerHTML='<p style="font-weight:400;font-size:22px;line-height:1.1">'+(currentLang==='en'?'Act ':'Atto ')+romans[i]+' — '+L(a.t)+'</p>'+
+      '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:40px">'+L(a.b)+'</p>';
     el.appendChild(d);
   });
+  var nota=document.createElement('div');
+  nota.style.cssText='background:var(--paper);color:var(--ink);border-top:1px solid #000;padding:16px 20px 16px';
+  nota.innerHTML='<p style="font-weight:400;font-size:22px;line-height:1.1">'+L(REGOLAMENTO_NOTA.t)+'</p>'+
+    '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:40px">'+L(REGOLAMENTO_NOTA.b)+'</p>';
+  el.appendChild(nota);
 }
 
 /* ---- Profilo ---- */
-var SESSO_LABELS={F:'Donna',M:'Uomo',A:'Altro',N:'Preferisco non dire'};
-var NAZIONALITA_LIST=['Italiana','Francese','Tedesca','Spagnola','Portoghese','Britannica','Irlandese',
-  'Svizzera','Austriaca','Belga','Olandese','Greca','Croata','Slovena','Polacca','Ceca','Slovacca',
-  'Ungherese','Rumena','Bulgara','Russa','Ucraina','Turca','Statunitense','Canadese','Messicana',
-  'Brasiliana','Argentina','Cinese','Giapponese','Coreana','Indiana','Australiana','Egiziana','Marocchina','Altra'];
+var SESSO_LABELS={
+  F:{it:'Donna',en:'Woman'}, M:{it:'Uomo',en:'Man'},
+  A:{it:'Altro',en:'Other'}, N:{it:'Preferisco non dire',en:'Prefer not to say'}
+};
+/* il valore salvato resta sempre in italiano (canonico); solo l'etichetta mostrata cambia lingua */
+var NAZIONALITA_LIST=[
+  {it:'Italiana',en:'Italian'},{it:'Francese',en:'French'},{it:'Tedesca',en:'German'},{it:'Spagnola',en:'Spanish'},
+  {it:'Portoghese',en:'Portuguese'},{it:'Britannica',en:'British'},{it:'Irlandese',en:'Irish'},{it:'Svizzera',en:'Swiss'},
+  {it:'Austriaca',en:'Austrian'},{it:'Belga',en:'Belgian'},{it:'Olandese',en:'Dutch'},{it:'Greca',en:'Greek'},
+  {it:'Croata',en:'Croatian'},{it:'Slovena',en:'Slovenian'},{it:'Polacca',en:'Polish'},{it:'Ceca',en:'Czech'},
+  {it:'Slovacca',en:'Slovak'},{it:'Ungherese',en:'Hungarian'},{it:'Rumena',en:'Romanian'},{it:'Bulgara',en:'Bulgarian'},
+  {it:'Russa',en:'Russian'},{it:'Ucraina',en:'Ukrainian'},{it:'Turca',en:'Turkish'},{it:'Statunitense',en:'American'},
+  {it:'Canadese',en:'Canadian'},{it:'Messicana',en:'Mexican'},{it:'Brasiliana',en:'Brazilian'},{it:'Argentina',en:'Argentinian'},
+  {it:'Cinese',en:'Chinese'},{it:'Giapponese',en:'Japanese'},{it:'Coreana',en:'Korean'},{it:'Indiana',en:'Indian'},
+  {it:'Australiana',en:'Australian'},{it:'Egiziana',en:'Egyptian'},{it:'Marocchina',en:'Moroccan'},{it:'Altra',en:'Other'}
+];
 function nazionalitaOptionsHTML(selected){
-  return '<option value="">Seleziona</option>'+NAZIONALITA_LIST.map(function(n){
-    return '<option value="'+n+'"'+(selected===n?' selected':'')+'>'+n+'</option>';
+  return '<option value="">'+(currentLang==='en'?'Select':'Seleziona')+'</option>'+NAZIONALITA_LIST.map(function(n){
+    return '<option value="'+n.it+'"'+(selected===n.it?' selected':'')+'>'+L(n)+'</option>';
+  }).join('');
+}
+var ETA_LIST=['Under 18','18–25','26–35','36–45','46–55','56–65','Over 65'];
+function etaOptionsHTML(selected){
+  return '<option value="">'+(currentLang==='en'?'Select':'Seleziona')+'</option>'+ETA_LIST.map(function(e){
+    return '<option value="'+e+'"'+(selected===e?' selected':'')+'>'+e+'</option>';
   }).join('');
 }
 var PROFILO_FIELDS=[
-  {k:'nome',label:'Nome'},
-  {k:'sesso',label:'Sesso'},
-  {k:'eta',label:'Età'},
-  {k:'nazionalita',label:'Nazionalità'}
+  {k:'nome',label:{it:'Nome',en:'Name'}},
+  {k:'sesso',label:{it:'Genere',en:'Gender'}},
+  {k:'eta',label:{it:'Età',en:'Age'}},
+  {k:'nazionalita',label:{it:'Provenienza',en:'Origin'}}
 ];
 var pencilIcon='<svg width="18" height="18" viewBox="0 0 18 18"><path d="M2.5 15.5l.6-3.2 8-8 2.6 2.6-8 8-3.2.6z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.6 5.8l2.6 2.6" stroke="currentColor" stroke-width="1.4"/></svg>';
 function renderProfilo(){
@@ -815,12 +983,19 @@ function renderProfilo(){
     el.appendChild(d);
   });
 }
+function nazionalitaLabel(it){
+  var found=NAZIONALITA_LIST.filter(function(n){return n.it===it})[0];
+  return found?L(found):it;
+}
 function profiloRowHTML(f){
-  var v=f.k==='sesso' ? (SESSO_LABELS[currentUser.sesso]||currentUser.sesso) : currentUser[f.k];
+  var v=currentUser[f.k];
+  if(f.k==='sesso') v=L(SESSO_LABELS[currentUser.sesso])||currentUser.sesso;
+  else if(f.k==='nazionalita') v=nazionalitaLabel(currentUser.nazionalita);
+  var label=L(f.label);
   return '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px">'+
-    '<div style="flex:1 1 auto;min-width:0"><p class="kicker">'+f.label+'</p>'+
+    '<div style="flex:1 1 auto;min-width:0"><p class="kicker">'+label+'</p>'+
     '<p style="font-weight:400;font-size:16px;line-height:1.1;margin-top:8px">'+v+'</p></div>'+
-    '<button class="pf-edit" onclick="editProfiloField(\''+f.k+'\')" aria-label="Modifica '+f.label+'">'+pencilIcon+'</button></div>';
+    '<button class="pf-edit" onclick="editProfiloField(\''+f.k+'\')" aria-label="'+(currentLang==='en'?'Edit ':'Modifica ')+label+'">'+pencilIcon+'</button></div>';
 }
 function editProfiloField(key){
   var f=PROFILO_FIELDS.filter(function(x){return x.k===key})[0]; if(!f)return;
@@ -828,16 +1003,19 @@ function editProfiloField(key){
   var input;
   if(key==='sesso'){
     input='<select id="pf-input-'+key+'" class="pf-input" onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
-      Object.keys(SESSO_LABELS).map(function(code){return '<option value="'+code+'"'+(currentUser.sesso===code?' selected':'')+'>'+SESSO_LABELS[code]+'</option>'}).join('')+
+      Object.keys(SESSO_LABELS).map(function(code){return '<option value="'+code+'"'+(currentUser.sesso===code?' selected':'')+'>'+L(SESSO_LABELS[code])+'</option>'}).join('')+
       '</select>';
   } else if(key==='nazionalita'){
     input='<select id="pf-input-'+key+'" class="pf-input" onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
       nazionalitaOptionsHTML(currentUser.nazionalita)+'</select>';
+  } else if(key==='eta'){
+    input='<select id="pf-input-'+key+'" class="pf-input" onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">'+
+      etaOptionsHTML(currentUser.eta)+'</select>';
   } else {
-    input='<input id="pf-input-'+key+'" class="pf-input" type="'+(key==='eta'?'number':'text')+'" value="'+(currentUser[key]||'')+'" '+
+    input='<input id="pf-input-'+key+'" class="pf-input" type="text" value="'+(currentUser[key]||'')+'" '+
       'onblur="saveProfiloField(\''+key+'\')" onkeydown="if(event.key===\'Enter\')this.blur()">';
   }
-  row.innerHTML='<p class="kicker">'+f.label+'</p>'+input;
+  row.innerHTML='<p class="kicker">'+L(f.label)+'</p>'+input;
   var el=document.getElementById('pf-input-'+key); if(el){ el.focus(); if(el.select) el.select() }
 }
 function saveProfiloField(key){
@@ -866,45 +1044,45 @@ var osmMap=null;
 /* punti d'attracco per macro-area, elenchi definitivi forniti. Coordinate da OpenStreetMap;
    dove segnalato in "note" sono posizioni approssimate (luogo non ancora mappato puntualmente). */
 var PINS=[
-  {area:'mare', name:'Mole Vanvitelliana', note:'Punto di attracco iniziale, sede del totem', lng:13.5044, lat:43.6144},
-  {area:'mare', name:'Porto Antico', note:'Con la Fontana dei Due Soli di Enzo Cucchi', lng:13.5026, lat:43.6249},
+  {area:'mare', name:'Mole Vanvitelliana', note:{it:'Punto di attracco iniziale, sede del totem',en:'Initial mooring point, home of the totem'}, lng:13.5044, lat:43.6144},
+  {area:'mare', name:'Porto Antico', note:{it:'Con la Fontana dei Due Soli di Enzo Cucchi',en:'With the Fountain of the Two Suns by Enzo Cucchi'}, lng:13.5026, lat:43.6249},
   {area:'mare', name:'Arco di Traiano', lng:13.5065, lat:43.6253},
-  {area:'mare', name:'Arco Clementino', note:'Molo Clementino', lng:13.5050, lat:43.6252},
-  {area:'mare', name:'Porta Pia', note:"Ingresso simbolico adiacente alla Mole", lng:13.5050, lat:43.6154},
-  {area:'mare', name:'Casa del Capitano', note:'Futuro planetario didattico', lng:13.5093, lat:43.6237},
-  {area:'mare', name:'Marina Dorica', note:'Porto turistico', lng:13.4853, lat:43.6099},
-  {area:'mare', name:'Mercato delle Erbe', note:'Vicino al Mandracchio — riqualificato, spazi eventi legati alla cucina di mare', lng:13.5141, lat:43.6185},
+  {area:'mare', name:'Arco Clementino', note:{it:'Molo Clementino',en:'Clementino Pier'}, lng:13.5050, lat:43.6252},
+  {area:'mare', name:'Porta Pia', note:{it:"Ingresso simbolico adiacente alla Mole",en:'Symbolic entrance next to the Mole'}, lng:13.5050, lat:43.6154},
+  {area:'mare', name:'Casa del Capitano', note:{it:'Futuro planetario didattico',en:'Future educational planetarium'}, lng:13.5093, lat:43.6237},
+  {area:'mare', name:'Marina Dorica', note:{it:'Porto turistico',en:'Marina'}, lng:13.4853, lat:43.6099},
+  {area:'mare', name:'Mercato delle Erbe', note:{it:'Vicino al Mandracchio — riqualificato, spazi eventi legati alla cucina di mare',en:'Near the Mandracchio — redeveloped, event spaces linked to sea cuisine'}, lng:13.5141, lat:43.6185},
   {area:'maestra', name:'Duomo di San Ciriaco', lng:13.5102, lat:43.6253},
   {area:'maestra', name:'Pinacoteca Civica Francesco Podesti', lng:13.5111, lat:43.6209},
   {area:'maestra', name:'Anfiteatro Romano', lng:13.5124, lat:43.6247},
-  {area:'maestra', name:'Museo Archeologico Nazionale delle Marche', note:'Palazzo Ferretti — MAN Marche', lng:13.5107, lat:43.6234},
+  {area:'maestra', name:'Museo Archeologico Nazionale delle Marche', note:{it:'Palazzo Ferretti — MAN Marche',en:'Palazzo Ferretti — MAN Marche'}, lng:13.5107, lat:43.6234},
   {area:'maestra', name:'Biblioteca Comunale Luciano Benincasa', lng:13.5108, lat:43.6229},
-  {area:'maestra', name:'Museo della Città', note:'Spazio Presente', lng:13.5119, lat:43.6195},
-  {area:'maestra', name:'Palazzo degli Anziani', note:'Futuro Urban Center', lng:13.5108, lat:43.6227},
+  {area:'maestra', name:'Museo della Città', note:{it:'Spazio Presente',en:'Spazio Presente'}, lng:13.5119, lat:43.6195},
+  {area:'maestra', name:'Palazzo degli Anziani', note:{it:'Futuro Urban Center',en:'Future Urban Center'}, lng:13.5108, lat:43.6227},
   {area:'maestra', name:'Teatro delle Muse', lng:13.5101, lat:43.6196},
-  {area:'maestra', name:'Casa Francesco Podesti', note:'Quartiere Capodimonte', lng:13.5098, lat:43.6163},
+  {area:'maestra', name:'Casa Francesco Podesti', note:{it:'Quartiere Capodimonte',en:'Capodimonte district'}, lng:13.5098, lat:43.6163},
   {area:'maestra', name:'Rifugio Birarelli', lng:13.5120, lat:43.6239},
-  {area:'maestra', name:'Ex Cobianchi', note:'Futuro co-working', lng:13.5131, lat:43.6179},
+  {area:'maestra', name:'Ex Cobianchi', note:{it:'Futuro co-working',en:'Future co-working space'}, lng:13.5131, lat:43.6179},
   {area:'maestra', name:'Chiesa del SS. Sacramento', lng:13.5096, lat:43.6187},
-  {area:'maestra', name:'Santa Maria della Piazza', note:'Con i mosaici paleocristiani', lng:13.5106, lat:43.6205},
+  {area:'maestra', name:'Santa Maria della Piazza', note:{it:'Con i mosaici paleocristiani',en:'With the early Christian mosaics'}, lng:13.5106, lat:43.6205},
   {area:'maestra', name:'Loggia dei Mercanti', lng:13.5098, lat:43.6201},
   {area:'parco', name:'Parco del Cardeto', lng:13.5194, lat:43.6218},
-  {area:'parco', name:'Polveriera Castelfidardo', note:'Futuro hub culturale', lng:13.5199, lat:43.6215},
-  {area:'parco', name:'Cimitero Ebraico', note:'600 anni nel 2028 — posizione approssimata (via Astagno)', lng:13.5078, lat:43.6149},
-  {area:'parco', name:'Casa delle Farfalle', note:'Progetto futuro nel Cardeto — posizione approssimata', lng:13.5194, lat:43.6218},
-  {area:'parco', name:'Passetto', note:'Scalinata, Monumento ai Caduti, grotte, laghetti', lng:13.5330, lat:43.6146},
-  {area:'parco', name:'Porta Pietralacroce', note:'Una delle quattro porte del parco', lng:13.5407, lat:43.6023},
-  {area:'parco', name:'Porta Camerano', note:'Una delle quattro porte del parco — posizione approssimata (centro di Camerano)', lng:13.5476, lat:43.5235},
-  {area:'parco', name:'Porta Numana', note:'Una delle quattro porte del parco — posizione approssimata (centro di Numana)', lng:13.6140, lat:43.4924},
-  {area:'parco', name:'Porta Sirolo', note:'Una delle quattro porte del parco — posizione approssimata (centro di Sirolo)', lng:13.6066, lat:43.5191},
-  {area:'parco', name:'Baia di Portonovo', note:'Percorso pedonale in costruzione', lng:13.5931, lat:43.5619},
+  {area:'parco', name:'Polveriera Castelfidardo', note:{it:'Futuro hub culturale',en:'Future cultural hub'}, lng:13.5199, lat:43.6215},
+  {area:'parco', name:'Cimitero Ebraico', note:{it:'600 anni nel 2028 — posizione approssimata (via Astagno)',en:'600 years in 2028 — approximate position (Via Astagno)'}, lng:13.5078, lat:43.6149},
+  {area:'parco', name:'Casa delle Farfalle', note:{it:'Progetto futuro nel Cardeto — posizione approssimata',en:'Future project in the Cardeto — approximate position'}, lng:13.5194, lat:43.6218},
+  {area:'parco', name:'Passetto', note:{it:'Scalinata, Monumento ai Caduti, grotte, laghetti',en:'Staircase, War Memorial, caves, small lakes'}, lng:13.5330, lat:43.6146},
+  {area:'parco', name:'Porta Pietralacroce', note:{it:'Una delle quattro porte del parco',en:'One of the park\'s four gates'}, lng:13.5407, lat:43.6023},
+  {area:'parco', name:'Porta Camerano', note:{it:'Una delle quattro porte del parco — posizione approssimata (centro di Camerano)',en:'One of the park\'s four gates — approximate position (Camerano centre)'}, lng:13.5476, lat:43.5235},
+  {area:'parco', name:'Porta Numana', note:{it:'Una delle quattro porte del parco — posizione approssimata (centro di Numana)',en:'One of the park\'s four gates — approximate position (Numana centre)'}, lng:13.6140, lat:43.4924},
+  {area:'parco', name:'Porta Sirolo', note:{it:'Una delle quattro porte del parco — posizione approssimata (centro di Sirolo)',en:'One of the park\'s four gates — approximate position (Sirolo centre)'}, lng:13.6066, lat:43.5191},
+  {area:'parco', name:'Baia di Portonovo', note:{it:'Percorso pedonale in costruzione',en:'Pedestrian path under construction'}, lng:13.5931, lat:43.5619},
   {area:'parco', name:'Abbazia di Santa Maria di Portonovo', lng:13.6021, lat:43.5609},
-  {area:'culturale', name:'Mole Vanvitelliana', note:'Ospita anche progetti mare e innovazione/giovani — Next Frame Lab, Cinematica', lng:13.5044, lat:43.6144},
-  {area:'culturale', name:'Caserma Villarey', note:'Futuro Museo di Ateneo UNIVPM', lng:13.5169, lat:43.6205},
-  {area:'culturale', name:'Area ex Mattatoio', note:'Spazio Carta, Spazio Culture, AncoHousing', lng:13.5142, lat:43.6081},
-  {area:'culturale', name:"Piazza d'Armi", note:'Mercato, quartiere Piano San Lazzaro', lng:13.5078, lat:43.6007},
-  {area:'culturale', name:'Villa Colonnelli', note:'Posatora — residenze per artisti', lng:13.4890, lat:43.6024},
-  {area:'culturale', name:'Stadio Dorico', note:'Futuro hub cultura sportiva', lng:13.5299, lat:43.6169}
+  {area:'culturale', name:'Mole Vanvitelliana', note:{it:'Ospita anche progetti mare e innovazione/giovani — Next Frame Lab, Cinematica',en:'Also hosts sea and youth-innovation projects — Next Frame Lab, Cinematica'}, lng:13.5044, lat:43.6144},
+  {area:'culturale', name:'Caserma Villarey', note:{it:'Futuro Museo di Ateneo UNIVPM',en:'Future UNIVPM University Museum'}, lng:13.5169, lat:43.6205},
+  {area:'culturale', name:'Area ex Mattatoio', note:{it:'Spazio Carta, Spazio Culture, AncoHousing',en:'Spazio Carta, Spazio Culture, AncoHousing'}, lng:13.5142, lat:43.6081},
+  {area:'culturale', name:"Piazza d'Armi", note:{it:'Mercato, quartiere Piano San Lazzaro',en:'Market, Piano San Lazzaro district'}, lng:13.5078, lat:43.6007},
+  {area:'culturale', name:'Villa Colonnelli', note:{it:'Posatora — residenze per artisti',en:'Posatora — artist residencies'}, lng:13.4890, lat:43.6024},
+  {area:'culturale', name:'Stadio Dorico', note:{it:'Futuro hub cultura sportiva',en:'Future sports-culture hub'}, lng:13.5299, lat:43.6169}
 ];
 var mapPinEls=[];
 var mapPinPopup=null;
@@ -1001,7 +1179,7 @@ function renderMappaCards(){
     var d=document.createElement('div'); d.className='areacard'; d.dataset.area=c.area; d.style.background=AREAS[c.area].color;
     var nums='';
     for(var n=1;n<=4;n++){ nums+='<span'+(n===i+1?' class="on"':'')+' onclick="scrollToAreaCard('+(n-1)+')">'+n+'</span>'; }
-    d.innerHTML='<div class="ac-top"><div class="ac-t">'+c.t+'</div><div class="ac-d">'+c.d+'</div></div>'+
+    d.innerHTML='<div class="ac-top"><div class="ac-t">'+L(c.t)+'</div><div class="ac-d">'+L(c.d)+'</div></div>'+
       '<div class="ac-bottom"><svg class="ac-icon" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[c.area]+'</svg><div class="ac-nums">'+nums+'</div></div>';
     el.appendChild(d);
   });
@@ -1039,13 +1217,12 @@ function scrollToAreaCard(idx){
 }
 function showPin(area,name,note,el,lngLat){
   if(mapPinPopup) mapPinPopup.remove();
+  var noteText=L(note);
   var html='<div class="map-pin-label" style="background:'+AREAS[area].hex+'">'+
     '<div class="pl-name">'+name+'</div>'+
-    (note?'<div class="pl-note">'+note+'</div>':'')+'</div>';
+    (noteText?'<div class="pl-note">'+noteText+'</div>':'')+'</div>';
   mapPinPopup=new maplibregl.Popup({closeButton:false, closeOnClick:false, offset:14, maxWidth:'240px'})
     .setLngLat(lngLat).setHTML(html).addTo(osmMap);
-  var tip=mapPinPopup.getElement().querySelector('.maplibregl-popup-tip');
-  if(tip){ ['borderTopColor','borderBottomColor','borderLeftColor','borderRightColor'].forEach(function(k){ tip.style[k]=AREAS[area].hex }) }
   document.querySelectorAll('.map-pin').forEach(function(c){c.classList.remove('on')});
   el.classList.add('on');
 }
@@ -1055,39 +1232,52 @@ function renderTickets(){
   var el=document.getElementById('ticket-table'); el.innerHTML='';
   TICKETS.forEach(function(k,i){
     var d=document.createElement('div'); d.className='ticket-row '+(i%2===0?'a':'b');
-    d.innerHTML='<div><div class="tk-t">'+k.t+'</div><div class="tk-s">'+k.s+'</div></div><div class="tk-p">'+k.p+'</div>';
+    d.innerHTML='<div><div class="tk-t">'+L(k.t)+'</div><div class="tk-s">'+L(k.s)+'</div></div><div class="tk-p">'+L(k.p)+'</div>';
     el.appendChild(d);
   });
 }
 
 /* ---- Sigillo / attracchi ---- */
 var STAMP_SRC={
-  mare:'asset/icone/icone-questomare-timbro.svg',
-  maestra:'asset/icone/icone-viamaestra-timbro.svg',
-  parco:'asset/icone/icone-adessoparco-timbro.svg',
-  culturale:'asset/icone/icone-marecultura-timbro.svg'
+  mare:'asset/icone/icone-questomare-timbro-testo-13.svg',
+  maestra:'asset/icone/icone-viamaestra-timbro-testo-12.svg',
+  parco:'asset/icone/icone-adessoparco-timbro-testo-10.svg',
+  culturale:'asset/icone/icone-marecultura-timbro-testo-11.svg'
 };
+/* inclinazione fissa per area, sempre diversa tra i quattro timbri */
+var STAMP_ROT={mare:'-18deg',maestra:'10deg',parco:'-7deg',culturale:'22deg'};
 function addAttracco(name,area){
   var h = Math.floor(Math.random()*12)+8;
   var m = Math.floor(Math.random()*60);
   var timeStr = (h<10?'0'+h:h) + ':' + (m<10?'0'+m:m);
-  attracchi.push({name:name,area:area,time:timeStr});
+  var pos=showStamp(area);
+  attracchi.push({name:name,area:area,time:timeStr,left:pos.left,top:pos.top});
   saveAttracchi();
-  renderAttracchi(); updateSigillo(); showStamp(area);
+  renderAttracchi(); updateSigillo();
 }
-function showStamp(area){
+function showStamp(area,pos){
   var slot=document.getElementById('stampSlot');
   var img=document.createElement('img');
   img.src=STAMP_SRC[area]||STAMP_SRC.mare;
-  img.alt='Timbro';
-  var maxLeft=Math.max(0, slot.clientWidth-136);
-  var maxTop=Math.max(0, slot.clientHeight-136);
-  img.style.left=(Math.random()*maxLeft)+'px';
-  img.style.top=(Math.random()*maxTop)+'px';
-  img.style.setProperty('--rot', (Math.random()*40-20).toFixed(1)+'deg');
+  img.alt=currentLang==='en'?'Stamp':'Timbro';
+  var left,top;
+  if(pos){
+    left=pos.left; top=pos.top;
+  } else {
+    /* lo slot può essere nascosto (display:none) al primo render: si usa .viewport,
+       sempre visibile, come base per non finire sempre a sinistra/in alto */
+    var vp=document.querySelector('.viewport');
+    var w=(vp&&vp.clientWidth)||390, h=422;
+    var maxLeft=Math.max(0, w-40-160), maxTop=Math.max(0, h-160);
+    left=Math.random()*maxLeft; top=Math.random()*maxTop;
+  }
+  img.style.left=left+'px';
+  img.style.top=top+'px';
+  img.style.setProperty('--rot', STAMP_ROT[area]||'0deg');
   slot.appendChild(img);
   requestAnimationFrame(function(){img.classList.add('show')});
   makeStampDraggable(img, slot);
+  return {left:left,top:top};
 }
 function makeStampDraggable(img, slot){
   var startX, startY, origLeft, origTop, dragging=false;
@@ -1121,7 +1311,7 @@ function renderAttracchi(){
   var el=document.getElementById('attracchi'); el.innerHTML='';
   attracchi.forEach(function(a){
     var d=document.createElement('div'); d.className='attraccorow'; d.style.background=AREAS[a.area].color;
-    d.innerHTML='<div><div class="ar-t">'+a.name+'</div><div class="ar-m"><span>Attracco</span> · '+a.time+'</div></div>'+
+    d.innerHTML='<div><div class="ar-t">'+a.name+'</div><div class="ar-m"><span>'+(currentLang==='en'?'Mooring':'Attracco')+'</span> · '+a.time+'</div></div>'+
       '<svg class="ar-icon" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[a.area]+'</svg>';
     el.appendChild(d);
   });
@@ -1133,12 +1323,22 @@ function updateSigillo(){
   var done=areasDone(); var n=done.length;
   var homeProg=document.getElementById('homeProgNum'); if(homeProg) homeProg.textContent=n;
   var btn=document.getElementById('stampBtn');
+  var gpsText=document.getElementById('sigillo-gps-text');
   var granted=document.getElementById('lp-granted'), locked=document.getElementById('lp-locked');
   if(n>=4){
-    btn.innerHTML='Ammissione completata <span class="material-symbols-outlined" style="margin-left:10px">check</span>'; btn.disabled=true; btn.style.cursor='default';
+    btn.innerHTML=(currentLang==='en'?'Go to Free Pratique':'Vai alla Libera Pratica')+' <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span>';
+    btn.disabled=false; btn.style.cursor='pointer'; btn.onclick=function(){go('libera')};
+    if(gpsText) gpsText.innerHTML=currentLang==='en'?"<span class='notch'>Bono</span>. Four areas, four moorings: your Free Pratique is ready.":"<span class='notch'>Bono</span>. Quattro aree, quattro attracchi: la tua Libera Pratica è pronta.";
     granted.style.display='flex'; locked.style.display='none'; granted.setAttribute('data-visible','1');
+    var tint=document.getElementById('lp-granted-tint');
+    if(tint){ tint.style.transition='none'; tint.style.opacity='1'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tint.style.transition='opacity 2s ease'; tint.style.opacity='.8'; }); }); }
+    var grantedVideo=document.querySelector('#lp-granted video');
+    if(grantedVideo){ var p=grantedVideo.play(); if(p&&p.catch) p.catch(function(){}); }
   } else {
-    granted.style.display='none'; locked.style.display='block'; granted.removeAttribute('data-visible');
+    btn.innerHTML='<span data-en="Register mooring">'+(currentLang==='en'?'Register mooring':'Registra attracco')+'</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">add</span>';
+    btn.disabled=false; btn.style.cursor='pointer'; btn.onclick=function(){registerAttracco()};
+    if(gpsText) gpsText.textContent=currentLang==='en'?"If GPS doesn't detect your mooring, register it by hand below. It only works if you're near the place.":'Se il GPS non rileva il tuo attracco, registralo a mano qui sotto. Funziona solo se sei vicino al luogo.';
+    granted.style.display='none'; locked.style.display='flex'; granted.removeAttribute('data-visible');
   }
 }
 function registerAttracco(){
@@ -1148,7 +1348,7 @@ function registerAttracco(){
   var list=document.getElementById('areaPickList'); list.innerHTML='';
   missing.forEach(function(k){
     var b=document.createElement('button'); b.className='areapick-btn'; b.style.color=AREAS[k].color;
-    b.innerHTML='<svg class="aic-wrap" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[k]+'</svg><span>'+AREAS[k].name+'</span>';
+    b.innerHTML='<svg class="aic-wrap" viewBox="0 0 141.73 141.73">'+AREA_ICON_SVG[k]+'</svg><span>'+areaName(k)+'</span>';
     b.onclick=function(){ pickArea(k) };
     list.appendChild(b);
   });
@@ -1157,12 +1357,15 @@ function registerAttracco(){
 }
 /* ancora l'overlay esattamente al riquadro dell'app (non alla finestra del browser),
    calcolandone le coordinate reali via JS invece di affidarsi al containing block CSS */
-function positionAreaPickOverlay(){
-  var vp=document.getElementById('viewport'); var ov=document.getElementById('areaPickOverlay');
+function positionOverlayToViewport(ov){
+  var vp=document.getElementById('viewport');
   if(!vp || !ov) return;
   var r=vp.getBoundingClientRect();
   ov.style.left=r.left+'px'; ov.style.top=r.top+'px';
   ov.style.width=r.width+'px'; ov.style.height=r.height+'px';
+}
+function positionAreaPickOverlay(){
+  positionOverlayToViewport(document.getElementById('areaPickOverlay'));
 }
 window.addEventListener('resize', function(){
   if(document.getElementById('areaPickOverlay').classList.contains('show')) positionAreaPickOverlay();
@@ -1171,8 +1374,22 @@ function closeAreaPick(){
   document.getElementById('areaPickOverlay').classList.remove('show');
 }
 function pickArea(area){
-  addAttracco(AREAS[area].name,area);
+  addAttracco(areaName(area),area);
   closeAreaPick();
+}
+function downloadCert(){
+  alert(currentLang==='en'?'Download coming soon!':'Download in arrivo!');
+}
+function shareCert(){
+  if(navigator.share){
+    navigator.share({
+      title: currentLang==='en'?'Free Pratique':'Libera Pratica',
+      text: currentLang==='en'?"I've obtained the Free Pratique in Ancona!":'Ho ottenuto la Libera Pratica ad Ancona!',
+      url: window.location.href
+    });
+  } else {
+    alert(currentLang==='en'?'Sharing not supported.':'Condivisione non supportata.');
+  }
 }
 
 /* boot — caricamento seguito, se serve, dalla registrazione; poi si entra sempre in Libera Pratica */
@@ -1182,7 +1399,7 @@ function submitRegistration(){
   var eta=document.getElementById('regEta').value;
   var naz=document.getElementById('regNazionalita').value.trim();
   var err=document.getElementById('regError');
-  if(!nome||!sesso||!eta||!naz){ err.textContent='Compila tutti i campi per continuare.'; return; }
+  if(!nome||!sesso||!eta||!naz){ err.textContent=currentLang==='en'?'Fill in all fields to continue.':'Compila tutti i campi per continuare.'; return; }
   currentUser={nome:nome,sesso:sesso,eta:eta,nazionalita:naz};
   saveUser(currentUser);
   attracchi=[];
@@ -1207,9 +1424,12 @@ function startBoot(){
 }
 
 /* ---- init ---- */
+applyStaticLang();
+updateLangButtons();
 document.getElementById('regNazionalita').innerHTML=nazionalitaOptionsHTML('');
+document.getElementById('regEta').innerHTML=etaOptionsHTML('');
 renderRegolamento(); renderPercorsiList(); renderMappaCards(); renderTickets(); renderAttracchi();
-attracchi.forEach(function(a){ showStamp(a.area); });
+attracchi.forEach(function(a){ showStamp(a.area, (a.left!=null&&a.top!=null)?{left:a.left,top:a.top}:null); });
 renderDettaglio(ROUTES[0].id); updateSigillo();
 syncFromHash();
 startBoot();
