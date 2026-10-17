@@ -1092,8 +1092,11 @@ function addMapPins(){
   filterPinsByArea(MAPPA_CARDS[0].area);
 }
 /* mostra solo i pin dell'area corrispondente al rettangolo attivo in "areacards" */
+var activeMapArea=null;
 function filterPinsByArea(area){
   mapPinEls.forEach(function(m){ m.el.style.display = (m.area===area) ? 'block' : 'none' });
+  if(activeMapArea!==null && activeMapArea!==area && mapPinPopup){ mapPinPopup.remove(); mapPinPopup=null; }
+  activeMapArea=area;
 }
 function initOsmMap(){
   if(osmMap || typeof maplibregl==='undefined') return;
