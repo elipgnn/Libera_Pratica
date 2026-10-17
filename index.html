@@ -32,7 +32,8 @@
   /* due soli font: Stack Sans Text (italiano/testo) e Stack Sans Notch (parole Sabir, classe .notch) */
   --disp:'Stack Sans Text','Helvetica Neue',Arial,sans-serif;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+a,button,[onclick]{-webkit-tap-highlight-color:transparent;outline:none}
 html,body{height:100%;overflow-x:hidden;overscroll-behavior-x:none}
 body{margin:0;background:#1d1d1b;color:var(--ink);font-family:var(--disp);font-weight:400;
   -webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;min-height:100dvh}
