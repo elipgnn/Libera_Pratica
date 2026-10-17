@@ -6,7 +6,6 @@
 <link rel="apple-touch-icon" href="asset/icona-app.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_forward,add,check,arrow_downward,share" />
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -30,13 +29,8 @@
   --verde:#3E8638;    /* Adesso Parco */
   --giallo:#F8B217;   /* Mare Culturale */
   --bordeaux:#3A2F7F; /* accento app (viola) — non mappato a un'area */
-  --line:rgba(20,19,15,.14);
-  --linep:rgba(242,238,230,.22);
-  /* Stack Sans Text è il font previsto (Regular in tutta l'app); non è un font web pubblico e qui non è
-     incorporato via @font-face, quindi finché non viene fornito il file finisce sempre sul fallback
-     Hanken Grotesk. .notch (solo cambio di font, niente corsivo né peso diverso) resta lo stand-in del taglio Notch per le parole di soglia/Sabir. */
-  --disp:'Stack Sans Text','Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
-  --mono:'Space Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  /* due soli font: Stack Sans Text (italiano/testo) e Stack Sans Notch (parole Sabir, classe .notch) */
+  --disp:'Stack Sans Text','Helvetica Neue',Arial,sans-serif;
 }
 *{box-sizing:border-box}
 html,body{height:100%;overflow-x:hidden;overscroll-behavior-x:none}
@@ -44,8 +38,7 @@ body{margin:0;background:#1d1d1b;color:var(--ink);font-family:var(--disp);font-w
   -webkit-font-smoothing:antialiased;display:flex;justify-content:center;align-items:center;min-height:100dvh}
 h1,h2,h3,h4,p,ol{margin:0;padding:0}
 button{font-family:var(--disp)}
-.notch{font-family:'Stack Sans Notch','Hanken Grotesk','Helvetica Neue',Arial,sans-serif;font-style:normal;font-weight:400}
-.mono{font-family:var(--mono)}
+.notch{font-family:'Stack Sans Notch','Helvetica Neue',Arial,sans-serif;font-style:normal;font-weight:400}
 .material-symbols-outlined{font-family:'Material Symbols Outlined';font-weight:normal;font-style:normal;
   font-size:24px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;
   white-space:nowrap;word-wrap:normal;direction:ltr;vertical-align:middle;
@@ -106,9 +99,9 @@ button{font-family:var(--disp)}
 .pad{padding:20px 20px 32px}
 .kicker{font-size:12px;font-weight:400;line-height:1.1;}
 .h-title{font-weight:400;letter-spacing:-.025em;line-height:1.1;font-size:24px}
-#det-title{font-size:22px}
+#det-title{font-size:24px}
 .h-hero{font-weight:400;font-size:30px;letter-spacing:-.02em;line-height:1.1}
-.h-big{font-weight:700;font-size:44px;letter-spacing:-.03em;line-height:.95}
+.h-big{font-weight:400;font-size:44px;letter-spacing:-.03em;line-height:.95}
 
 .appbtn{display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--ink);
   color:var(--paper);border:none;cursor:pointer;font-weight:400;font-size:18px;padding:16px 20px;letter-spacing:-.01em}
@@ -140,7 +133,6 @@ button{font-family:var(--disp)}
 
 .block{padding:20px 20px}
 .block.bordeaux{background:var(--bordeaux);color:#fff}
-.block.ink{background:var(--ink);color:var(--paper)}
 
 .imgph{position:relative;background:transparent;overflow:hidden;flex:0 0 auto}
 .imgph svg, .imgph img{display:block;width:100%;height:100%;margin:0;padding:0;border:none!important;outline:none!important;box-shadow:none!important}
@@ -149,7 +141,7 @@ button{font-family:var(--disp)}
 .duo .imgph{flex:1 1 auto;min-width:0;border:none!important}
 .duo .swatch{width:auto;flex:0 0 calc(33.333% - 9.333px);border:none!important}
 
-.areachip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;
+.areachip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:400;
   text-transform:uppercase;letter-spacing:.06em;border:2px solid currentColor;padding:8px 13px;margin:0 8px 8px 0}
 
 .routerow{display:block;width:100%;text-align:left;background:var(--ink);color:var(--paper);border:none;
@@ -217,15 +209,15 @@ button{font-family:var(--disp)}
 .pin{cursor:pointer}
 .map-pin{width:12px;height:12px}
 .map-pin .dot{width:100%;height:100%;border-radius:50%;transition:transform .2s ease}
-.map-pin.on .dot{transform:scale(1.35)}
+.map-pin.on .dot{transform:scale(1.43)}
 
 /* etichetta del pin direttamente sulla mappa (popup MapLibre), al posto della card sotto la mappa */
 .maplibregl-popup-content{padding:0;border-radius:0;box-shadow:0 2px 10px rgba(0,0,0,.3);overflow:hidden}
 .maplibregl-popup-close-button{display:none}
 .maplibregl-popup-tip{display:none}
-.map-pin-label{padding:10px 14px;color:#fff;font-family:var(--disp);max-width:220px}
-.map-pin-label .pl-name{font-size:14px;font-weight:400;line-height:1.1}
-.map-pin-label .pl-note{font-size:11px;font-weight:400;line-height:1.2;margin-top:4px}
+.map-pin-label{padding:10px 14px;color:#fff;font-family:var(--disp);max-width:220px;text-align:center}
+.map-pin-label .pl-name{font-size:14px;font-weight:400;line-height:1}
+.map-pin-label .pl-note{font-size:11px;font-weight:400;line-height:1.05;margin:4px auto 0;max-width:150px}
 
 .areacards{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .areacards::-webkit-scrollbar{height:0}
@@ -236,7 +228,7 @@ button{font-family:var(--disp)}
 .areacard .ac-bottom{display:flex;align-items:flex-end;justify-content:space-between;margin-top:16px;gap:16px}
 .areacard .ac-icon{width:60px;height:60px;flex:0 0 auto}
 .areacard .ac-icon .aic{fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.8}
-.areacard .ac-nums{font-family:var(--mono);font-size:24px;line-height:1.1;letter-spacing:.05em;white-space:nowrap}
+.areacard .ac-nums{font-size:24px;line-height:1.1;white-space:nowrap}
 .areacard .ac-nums span{cursor:pointer;opacity:.4}
 .areacard .ac-nums span.on{opacity:1}
 
@@ -300,17 +292,6 @@ button{font-family:var(--disp)}
   font-size:12px;font-weight:400;line-height:1.1;gap:16px}
 
 /* --- griglia di riferimento temporanea: colonne 6/16/20, righe 8/16 — da rimuovere a verifica ultimata --- */
-.gridlayer{position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:430px;transform:translateX(-50%);z-index:9999;pointer-events:none}
-.gridlayer .cols{position:absolute;inset:0;display:flex;gap:14px;padding:0 20px}
-.gridlayer .cols i{flex:1 1 0;background:rgba(255,0,150,.09);border-left:1px solid rgba(255,0,150,.35);
-  border-right:1px solid rgba(255,0,150,.35);font-style:normal}
-.gridlayer .rows{position:absolute;inset:0;
-  background-image:repeating-linear-gradient(to bottom,rgba(0,140,255,.4) 0,rgba(0,140,255,.4) 1px,transparent 1px,transparent 8px);
-  background-position:0 16px}
-body.grid-off .gridlayer{display:none}
-.gridtoggle{position:fixed;right:14px;bottom:14px;z-index:10000;background:var(--ink);color:var(--paper);
-  border:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;padding:9px 13px;cursor:pointer;
-  text-transform:uppercase}
 </style>
 
 <div class="viewport boot-active" id="viewport">
@@ -323,7 +304,7 @@ body.grid-off .gridlayer{display:none}
         <nav class="navigation">
           <div class="content">
             <ul class="navlinks">
-              <li><button onclick="go('libera')" data-en="Free Pratique">Libera pratica</button></li>
+              <li><button onclick="go('libera')" data-en="Libera pratica">Libera pratica</button></li>
               <li><button onclick="go('sigillo')" data-en="Seal">Sigillo</button></li>
               <li><button onclick="go('percorsi')" data-en="Routes">Percorsi</button></li>
               <li><button onclick="go('mappa')" data-en="Map">Mappa</button></li>
@@ -381,7 +362,7 @@ body.grid-off .gridlayer{display:none}
           <div class="percitem">
             <p class="pi-s" data-en="<span class='notch'>Spettar</span> and understand — the wait, told by those who built it."><span class="notch">Spettar</span> e capire — l'attesa raccontata da chi la costruì.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 450 m</span><span data-en="3 stops">3 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 450 m</span><span data-en="3+2 stops">3+2 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
@@ -392,7 +373,7 @@ body.grid-off .gridlayer{display:none}
           <div class="percitem">
             <p class="pi-s" data-en="<span class='notch'>Andara</span> uphill — from the park to the hill, where the city breathes."><span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 1,3 km</span><span data-en="5 stops">5 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 1,3 km</span><span data-en="5+2 stops">5+2 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
@@ -403,7 +384,7 @@ body.grid-off .gridlayer{display:none}
           <div class="percitem">
             <p class="pi-s" data-en="<span class='notch'>Servir</span> the port — told by those who sang it."><span class="notch">Servir</span> il porto — raccontato da chi lo ha cantato.</p>
             <div class="pi-row">
-              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 900 m</span><span data-en="4 stops">4 tappe</span></div>
+              <div class="pi-meta"><span><svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 16s6-5.5 6-9.5A6 6 0 1 0 3 6.5C3 10.5 9 16 9 16Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="6.5" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/></svg> 900 m</span><span data-en="4+2 stops">4+2 tappe</span></div>
               <span class="material-symbols-outlined">arrow_forward</span>
             </div>
           </div>
@@ -423,10 +404,10 @@ body.grid-off .gridlayer{display:none}
         <div id="regolamento-atti"></div>
         <div class="ticker">
           <div class="tickertrack">
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
           </div>
         </div>
       </div>
@@ -447,10 +428,10 @@ body.grid-off .gridlayer{display:none}
         </div>
         <div class="ticker">
           <div class="tickertrack">
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
           </div>
         </div>
       </div>
@@ -461,7 +442,7 @@ body.grid-off .gridlayer{display:none}
           <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="Curated itineraries between sea, city and park. <span class='notch'>Andara</span> with a voice, at your own pace.">Itinerari curati tra mare, città e parco. <span class="notch">Andara</span> con una voce, a tuo ritmo.</p>
         </div>
         <div class="block bordeaux" style="padding-top:20px;padding-bottom:20px">
-          <span style="display:block;font-size:20px;font-weight:400;line-height:1.1;text-align:right" data-en="Possible routes">Percorsi possibili</span>
+          <span style="display:block;font-size:22px;font-weight:400;line-height:1.1;text-align:right" data-en="Possible routes">Percorsi possibili</span>
           <span class="h-big" style="display:block;font-weight:400;line-height:.85;font-size:50px;margin-top:8px;text-align:right">12</span>
         </div>
         <div class="duo" style="height:177px">
@@ -471,10 +452,10 @@ body.grid-off .gridlayer{display:none}
         <div id="percorsi-list"></div>
         <div class="ticker" style="background:var(--bordeaux)">
           <div class="tickertrack">
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
-            <span data-en="Free Pratique — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
+            <span data-en="Libera Pratica — Ancona 2028">Libera Pratica — Ancona 2028</span>
           </div>
         </div>
       </div>
@@ -482,7 +463,7 @@ body.grid-off .gridlayer{display:none}
       <!-- DETTAGLIO PERCORSO (dinamico) -->
       <div class="appscreen" id="s-dettaglio">
         <div class="duo" style="height:177px">
-          <div class="imgph"><video src="asset/video/video_ancona_5_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
+          <div class="imgph"><video id="det-video" src="asset/video/video_ancona_5_bw.mp4" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block"></video></div>
           <div class="swatch imgph" id="det-swatch" style="display:flex;align-items:center;justify-content:center">
           </div>
         </div>
@@ -548,7 +529,7 @@ body.grid-off .gridlayer{display:none}
       <!-- BIGLIETTI -->
       <div class="appscreen" id="s-biglietti">
         <div class="pad" style="padding-bottom:14px;padding-top:20px"><h2 class="h-title" data-en="Ticket office">Biglietteria</h2>
-          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="A single gateway for routes, events and places. Here <span class='notch'>danara</span> only serves the journey: the Free Pratique is not for sale.">Un solo varco per percorsi, eventi e luoghi. Qui la <span class="notch">danara</span> serve solo al viaggio: la Libera Pratica non si compra.</p>
+          <p style="font-size:16px;font-weight:400;margin-top:160px;line-height:1.1" data-en="A single gateway for routes, events and places. Here <span class='notch'>danara</span> only serves the journey: the Libera Pratica is not for sale.">Un solo varco per percorsi, eventi e luoghi. Qui la <span class="notch">danara</span> serve solo al viaggio: la Libera Pratica non si compra.</p>
         </div>
         <div class="duo" style="height:177px">
           <div class="imgph"><img src="asset/img/ancona_1.jpg" alt="Ancona" style="width:100%;height:100%;object-fit:cover;display:block"></div>
@@ -586,7 +567,7 @@ body.grid-off .gridlayer{display:none}
       <div class="appscreen" id="s-libera">
         <div id="lp-locked" class="block" style="position:relative;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;color:#000">
           <div style="width:100%;box-sizing:border-box;padding:0 20px">
-            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000" data-en="Your Free Pratique<br>awaits you">La tua Libera<br>Pratica ti attende</div>
+            <div style="font-weight:400;font-size:28px;letter-spacing:-.02em;line-height:1.1;color:#000" data-en="Your Libera Pratica<br>awaits you">La tua Libera<br>Pratica ti attende</div>
             <p style="font-size:16px;font-weight:400;line-height:1.1;margin-top:26px;color:#000" data-en="You need a mooring in each of the four areas. <span class='notch'>Spettar</span> a little longer: admission is near.">Ti serve un attracco in ognuna delle quattro aree. <span class="notch">Spettar</span> ancora un po': l'ammissione è vicina.</p>
             <button class="appbtn" style="margin-top:100px;margin-left:auto;margin-right:auto;width:calc(75% - 4px);padding:12px 16px;font-size:16px" onclick="go('sigillo')"><span data-en="Go to the Seal">Vai al Sigillo</span> <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span></button>
           </div>
@@ -597,26 +578,29 @@ body.grid-off .gridlayer{display:none}
           <p class="ct-k" style="position:absolute" data-en="Port of Ancona · MMXXVIII">Porto di Ancona · MMXXVIII</p>
           <div class="cert" style="position:relative">
             <img class="ct-mark" src="asset/loghi/logo-stella.svg" alt="">
-            <div class="ct-title notch" data-en="Free Pratique">Libera Pratica</div>
-            <div class="ct-body" data-en="Granted to <span class='notch'>Guest of the World</span> admission to this city, quarantine ended and sea and park visited. From this day declared temporary citizen of «Questo Adesso».">Si concede a <span class="notch">Ospite del Mondo</span> l'ammissione in questa città, cessata la contumacia e visitati mare e parco. Da questo giorno è dichiarato cittadino temporaneo di «Questo Adesso».</div>
-            <p class="ct-date" data-en="Issued · 14 June">Rilasciato · 14 giugno</p>
+            <div class="ct-title notch" data-en="Libera Pratica">Libera Pratica</div>
+            <div class="ct-body" id="ct-body"></div>
+            <p class="ct-date" data-en="Issued 21 October 2028">Rilasciata il 21 ottobre 2028</p>
           </div>
-          <div style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);display:flex;gap:8px;width:calc(75% - 4px);margin:0">
-            <button class="appbtn" style="flex:1;justify-content:center;padding:12px 16px;margin:0;font-size:16px" onclick="downloadCert()"><span data-en="Download">Scarica</span> <span class="material-symbols-outlined" style="margin-left:8px;font-size:22px">arrow_downward</span></button>
-            <button class="appbtn" style="flex:1;justify-content:center;padding:12px 16px;margin:0;font-size:16px" onclick="shareCert()"><span data-en="Share">Condividi</span> <span class="material-symbols-outlined" style="margin-left:8px;font-size:22px">share</span></button>
+          <div style="position:absolute;left:50%;bottom:32px;transform:translateX(-50%);display:flex;align-items:center;justify-content:space-between;width:calc(100% - 40px);margin:0">
+            <img src="asset/loghi/logo-ancona.svg" alt="Ancona" style="height:44px;width:auto;filter:brightness(0) invert(1)">
+            <div style="display:flex;gap:8px">
+              <button style="width:44px;height:44px;background:var(--ink);color:var(--paper);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="downloadCert()" aria-label="Scarica"><span class="material-symbols-outlined" style="font-size:22px">arrow_downward</span></button>
+              <button style="width:44px;height:44px;background:var(--ink);color:var(--paper);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="shareCert()" aria-label="Condividi"><span class="material-symbols-outlined" style="font-size:22px">share</span></button>
+            </div>
           </div>
         </div>
       </div>
 
     <div class="pagefooter">
-      <button class="pf-link" onclick="go('libera')" data-en="Free Pratique">Libera pratica</button>
+      <button class="pf-link" onclick="go('libera')" data-en="Libera pratica">Libera pratica</button>
       <button class="pf-link" onclick="go('sigillo')" data-en="Seal">Sigillo</button>
       <button class="pf-link" onclick="go('percorsi')" data-en="Routes">Percorsi</button>
       <button class="pf-link" onclick="go('mappa')" data-en="Map">Mappa</button>
       <button class="pf-link" onclick="go('biglietti')" data-en="Tickets">Biglietti</button>
       <button class="pf-link" onclick="go('regolamento')" data-en="Rules">Regolamento</button>
       <button class="pf-link" onclick="go('profilo')" data-en="Profile">Profilo</button>
-      <div class="pf-legal"><span data-en="Privacy">Privacy</span><span data-en="© 2028 Free Pratique — Ancona">© 2028 Libera Pratica — Ancona</span></div>
+      <div class="pf-legal"><span data-en="Privacy">Privacy</span><span data-en="© 2028 Libera Pratica — Ancona">© 2028 Libera Pratica — Ancona</span></div>
     </div>
 
     <div class="areapick-overlay" id="areaPickOverlay" onclick="closeAreaPick()">
@@ -690,7 +674,7 @@ var ROUTES=[
   {id:'contumacia',
    title:{it:'La contumacia gentile',en:'The Gentle Quarantine'},
    subtitle:{it:"<span class='notch'>Spettar</span> e capire — l'attesa raccontata da chi la costruì.",en:"<span class='notch'>Spettar</span> and understand — the wait, told by those who built it."},
-   narratore:'Luigi Vanvitelli',minuti:60,distanza:'450 m',foto:'asset/img/ancona_7.jpg',aree:['culturale','mare'],heroArea:'culturale',
+   narratore:'Luigi Vanvitelli',minuti:60,distanza:'450 m',foto:'asset/img/ancona_7.jpg',video:'asset/video/video_ancona_5_bw.mp4',aree:['culturale','mare'],heroArea:'culturale',
    ticket2:{it:'Biglietto con apertura serale',en:'Ticket with evening opening'},ticket2Prezzo:'12 €',
    desc:{it:"Prima di essere ammessi, bisognava aspettare. La Mole custodisce ancora il tempo sospeso della quarantena: un cortile, una sala, una banchina. <span class='notch'>Venir</span> piano: qui il rito comincia dal silenzio, non dal movimento.",
          en:"Before being admitted, one had to wait. The Mole still holds the suspended time of quarantine: a courtyard, a hall, a quay. <span class='notch'>Venir</span> slowly: here the rite begins with silence, not with movement."},
@@ -709,7 +693,7 @@ var ROUTES=[
   {id:'guasco',
    title:{it:'Il fiato del Guasco',en:'The Breath of Guasco'},
    subtitle:{it:'<span class="notch">Andara</span> in alto — dal parco al colle, dove la città respira.',en:'<span class="notch">Andara</span> uphill — from the park to the hill, where the city breathes.'},
-   narratore:'Ciriaco',minuti:110,distanza:'1,3 km',foto:'asset/img/ancona_8.jpg',aree:['parco','maestra'],heroArea:'parco',
+   narratore:'Ciriaco',minuti:110,distanza:'1,3 km',foto:'asset/img/ancona_8.jpg',video:'asset/video/video_ancona_2_bw.mp4',aree:['parco','maestra'],heroArea:'parco',
    ticket2:{it:'Biglietto con concerto',en:'Ticket with concert'},ticket2Prezzo:'14 €',
    desc:{it:"<span class='notch'>Makach</span> fretta: è il percorso più lungo, per chi vuole salire piano. Si parte dal verde del Cardeto e si arriva al Duomo; a ogni tappa la città si apre un po' di più sotto i tuoi occhi.",
          en:"<span class='notch'>Makach</span> hurry: it's the longest route, for those who want to climb slowly. You start from the green of the Cardeto and arrive at the Duomo; at every stop the city opens up a little more before your eyes."},
@@ -732,7 +716,7 @@ var ROUTES=[
   {id:'sale',
    title:{it:'La rotta del sale',en:'The Salt Route'},
    subtitle:{it:'<span class="notch">Servir</span> il porto — raccontato da chi lo ha cantato.',en:'<span class="notch">Servir</span> the port — told by those who sang it.'},
-   narratore:'Corelli',minuti:80,distanza:'900 m',foto:'asset/img/ancona_9.jpg',aree:['mare','parco'],heroArea:'mare',
+   narratore:'Corelli',minuti:80,distanza:'900 m',foto:'asset/img/ancona_9.jpg',video:'asset/video/video_ancona_3_bw.mp4',aree:['mare','parco'],heroArea:'mare',
    ticket2:{it:'Biglietto con mercato',en:'Ticket with market'},ticket2Prezzo:'10 €',
    desc:{it:"Dal molo alla banchina, dove le merci aspettavano il permesso di entrare in città. Qui si faceva <span class='notch'>danara</span> e si decideva il destino, sul confine tra il mare e la città.",
          en:"From the pier to the quay, where goods waited for permission to enter the city. Here <span class='notch'>danara</span> was made and destiny was decided, on the border between the sea and the city."},
@@ -774,13 +758,13 @@ var MAPPA_CARDS=[
 var ATTI=[
   {t:{it:'Un attracco per area',en:'One mooring per area'},
    b:{it:'Ancona è divisa in quattro aree: Questo Mare, Via Maestra, Adesso Parco, Mare Culturale. Per ottenere la Libera Pratica ti serve un attracco in ciascuna. Non conta quanti luoghi visiti.',
-      en:"Ancona is divided into four areas: This Sea, Main Street, Park Now, Cultural Sea. To get the Free Pratique you need a mooring in each one. It doesn't matter how many places you visit."}},
+      en:"Ancona is divided into four areas: This Sea, Main Street, Park Now, Cultural Sea. To get the Libera Pratica you need a mooring in each one. It doesn't matter how many places you visit."}},
   {t:{it:'Come ottenere un sigillo',en:'How to get a seal'},
    b:{it:"Vai in un luogo o a un evento. L'app ti riconosce con il GPS e registra l'attracco. Se il GPS non risponde, usa il check-in manuale. Per gli eventi conta l'orario: attracchi mentre si svolgono.",
       en:"Go to a place or an event. The app recognises you via GPS and registers the mooring. If GPS doesn't respond, use manual check-in. For events, the time counts: you dock while they're happening."}},
-  {t:{it:'La tua Libera Pratica',en:'Your Free Pratique'},
+  {t:{it:'La tua Libera Pratica',en:'Your Libera Pratica'},
    b:{it:"<span class='notch'>Bono</span>. Con un attracco in ogni area il sigillo si chiude e la Libera Pratica è tua. Puoi salvarla, mostrarla e condividerla. Resta valida anche dopo la partenza.",
-      en:"<span class='notch'>Bono</span>. With a mooring in every area the seal closes and the Free Pratique is yours. You can save it, show it and share it. It stays valid even after you leave."}}
+      en:"<span class='notch'>Bono</span>. With a mooring in every area the seal closes and the Libera Pratica is yours. You can save it, show it and share it. It stays valid even after you leave."}}
 ];
 var REGOLAMENTO_NOTA={
   t:{it:'Nota finale',en:'Final note'},
@@ -872,12 +856,16 @@ function toggleIntro(force){
 }
 
 /* ---- Percorsi ---- */
+function tappeLabel(r){
+  var luoghi=r.tappe.filter(function(t){return t.area}).length, extra=r.tappe.length-luoghi;
+  return luoghi+(extra?'+'+extra:'')+(currentLang==='en'?' stops':' tappe');
+}
 function renderPercorsiList(){
   var el=document.getElementById('percorsi-list'); el.innerHTML='';
   ROUTES.forEach(function(r){
     var b=document.createElement('button'); b.className='routerow';
     b.innerHTML='<h3 class="rr-t">'+L(r.title)+'</h3><p class="rr-s">'+L(r.subtitle)+'</p>'+
-      '<div class="rr-row"><div class="rr-meta"><span>'+timeIcon()+' ~'+r.minuti+' min</span><span>'+r.tappe.length+(currentLang==='en'?' stops':' tappe')+'</span></div>'+arrowIcon()+'</div>';
+      '<div class="rr-row"><div class="rr-meta"><span>'+timeIcon()+' ~'+r.minuti+' min</span><span>'+tappeLabel(r)+'</span></div>'+arrowIcon()+'</div>';
     b.onclick=function(){go('dettaglio',r.id)};
     el.appendChild(b);
   });
@@ -888,6 +876,8 @@ function renderDettaglio(id){
   document.getElementById('det-desc').innerHTML=L(r.desc);
   var sw=document.getElementById('det-swatch'); sw.style.background=AREAS[r.heroArea].color;
   var foto=document.getElementById('det-foto'); if(foto&&r.foto) foto.src=r.foto;
+  var vid=document.getElementById('det-video');
+  if(vid&&r.video&&vid.getAttribute('src')!==r.video){ vid.setAttribute('src',r.video); vid.load(); vid.play().catch(function(){}); }
   var t2=document.getElementById('det-ticket2'); if(t2&&r.ticket2) t2.textContent=L(r.ticket2)+' · '+r.ticket2Prezzo;
   var chips=document.getElementById('det-chips'); chips.innerHTML='';
   r.aree.forEach(function(a){
@@ -897,7 +887,7 @@ function renderDettaglio(id){
   var meta=document.getElementById('det-meta'); meta.style.background=AREAS[r.heroArea].color;
   meta.innerHTML='<span style="display:inline-flex;align-items:center;gap:6px;font-size:16px">'+timeIcon()+' ~'+r.minuti+' min</span>'+
     (r.distanza?'<span style="position:absolute;left:50%;top:16px;transform:translateX(-50%);font-size:16px">'+r.distanza+'</span>':'')+
-    '<span style="font-size:16px">'+r.tappe.length+(currentLang==='en'?' stops':' tappe')+'</span>';
+    '<span style="font-size:16px">'+tappeLabel(r)+'</span>';
   var tp=document.getElementById('det-tappe'); tp.innerHTML='';
   r.tappe.forEach(function(t,i){
     var li=document.createElement('li'); li.className='tappe-item';
@@ -1137,7 +1127,7 @@ function initDetMap(){
     detMap.addLayer({
       id:'route-line-layer', type:'line', source:'route-line',
       layout:{'line-join':'round','line-cap':'round'},
-      paint:{'line-color':'#1d1d1b','line-width':2.5,'line-dasharray':[1,2],'line-opacity':.7}
+      paint:{'line-color':'#1d1d1b','line-width':1.5,'line-dasharray':[1,2],'line-opacity':.7}
     });
     detMapLoaded=true;
     if(detMapPendingRoute){ drawDetMapLine(detMapPendingRoute); detMapPendingRoute=null; }
@@ -1321,17 +1311,21 @@ function areasDone(){
 }
 function updateSigillo(){
   var done=areasDone(); var n=done.length;
-  var homeProg=document.getElementById('homeProgNum'); if(homeProg) homeProg.textContent=n;
   var btn=document.getElementById('stampBtn');
   var gpsText=document.getElementById('sigillo-gps-text');
   var granted=document.getElementById('lp-granted'), locked=document.getElementById('lp-locked');
   if(n>=4){
-    btn.innerHTML=(currentLang==='en'?'Go to Free Pratique':'Vai alla Libera Pratica')+' <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span>';
+    btn.innerHTML=(currentLang==='en'?'Go to Libera Pratica':'Vai alla Libera Pratica')+' <span class="material-symbols-outlined" style="margin-left:10px;font-size:22px">arrow_forward</span>';
     btn.disabled=false; btn.style.cursor='pointer'; btn.onclick=function(){go('libera')};
-    if(gpsText) gpsText.innerHTML=currentLang==='en'?"<span class='notch'>Bono</span>. Four areas, four moorings: your Free Pratique is ready.":"<span class='notch'>Bono</span>. Quattro aree, quattro attracchi: la tua Libera Pratica è pronta.";
+    if(gpsText) gpsText.innerHTML=currentLang==='en'?"<span class='notch'>Bono</span>. Four areas, four moorings: your Libera Pratica is ready.":"<span class='notch'>Bono</span>. Quattro aree, quattro attracchi: la tua Libera Pratica è pronta.";
     granted.style.display='flex'; locked.style.display='none'; granted.setAttribute('data-visible','1');
+    var ctBody=document.getElementById('ct-body');
+    var nome=(currentUser&&currentUser.nome)?currentUser.nome:(currentLang==='en'?'Guest':'Ospite');
+    if(ctBody) ctBody.innerHTML=currentLang==='en'
+      ? 'Granted to '+nome+" admission to the city: <span class='notch'>contumacia</span> has ended and all four areas have been touched. From this day they hold temporary citizenship of Ancona."
+      : 'Si concede a '+nome+" l'ammissione in città: la <span class='notch'>contumacia</span> è cessata e le quattro aree sono state toccate. Da questo giorno gode della cittadinanza temporanea di Ancona.";
     var tint=document.getElementById('lp-granted-tint');
-    if(tint){ tint.style.transition='none'; tint.style.opacity='1'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tint.style.transition='opacity 2s ease'; tint.style.opacity='.8'; }); }); }
+    if(tint){ tint.style.transition='none'; tint.style.opacity='1'; requestAnimationFrame(function(){ requestAnimationFrame(function(){ tint.style.transition='opacity 2s ease'; tint.style.opacity='.9'; }); }); }
     var grantedVideo=document.querySelector('#lp-granted video');
     if(grantedVideo){ var p=grantedVideo.play(); if(p&&p.catch) p.catch(function(){}); }
   } else {
@@ -1383,8 +1377,8 @@ function downloadCert(){
 function shareCert(){
   if(navigator.share){
     navigator.share({
-      title: currentLang==='en'?'Free Pratique':'Libera Pratica',
-      text: currentLang==='en'?"I've obtained the Free Pratique in Ancona!":'Ho ottenuto la Libera Pratica ad Ancona!',
+      title: currentLang==='en'?'Libera Pratica':'Libera Pratica',
+      text: currentLang==='en'?"I've obtained the Libera Pratica in Ancona!":'Ho ottenuto la Libera Pratica ad Ancona!',
       url: window.location.href
     });
   } else {
